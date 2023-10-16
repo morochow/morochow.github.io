@@ -103,5 +103,5 @@ function showPage() {
 $("#button").on("click", function () {
   showPage();
   // You may want to add more logic here if needed
-  window.location.href = "https://morochow.github.io/index.html";
+  window.location.href = "../index.html";
 });
