@@ -52,7 +52,7 @@ $("#button").click(() => {
 });
 
 $("#button").on("click", function () {
-  window.location.href = "/dist/index.html";
+  window.location.href = "/index.html";
 });
 
 $(".js-trigger-transition").on("click", function (e) {
