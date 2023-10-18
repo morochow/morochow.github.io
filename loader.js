@@ -7,7 +7,7 @@ function transition() {
   var tl = new TimelineMax({
     onComplete: function () {
       // Redirect to index.html after animation completes
-      window.location.href = "../index.html";
+      window.location.href = "https://morochow.github.io/index.html";
     },
   });
 
