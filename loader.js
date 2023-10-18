@@ -52,7 +52,7 @@ $("#button").click(() => {
 });
 
 $("#button").on("click", function () {
-  window.location.href = "./index.html";
+  window.location.href = "https://morochow.github.io/index.html";
 });
 
 $(".js-trigger-transition").on("click", function (e) {
