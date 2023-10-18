@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css'>
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./slidei.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
 </head>
 
@@ -65,9 +66,7 @@
           <span class="panel__nav panel__nav--right-down js-down js-right">down/right</span>
           <span class="panel__nav panel__nav--left-down js-down js-left">down/left</span>
           <span class="panel__nav panel__nav--down js-down">down</span>
-          <button class="car_btn3 js-zoom js-down "> <img class="imgb" src="svg/expand.svg"
-              onmouseenter="this.src =`svg/maxiz.gif`;" onmouseout="this.src =`svg/expand.svg`;"
-              alt="something pithy"></button>
+
           <div class="box container container--ph">
             <iframe class="iframe2--responsive" src="svg/logooutline.svg"></iframe>
             <iframe class="iframe3--responsive" src="svg/logomodan.svg"></iframe>
@@ -107,7 +106,7 @@
               <input type="radio" name="slider" title="slide12" class="slider__nav" />
               <input type="radio" name="slider" title="slide13" class="slider__nav" />
               <h6>visual identities</h6>
-              <button class="car_btn js-zoom js-down js-right"> <img class="imgb" src="svg/expand.svg"
+              <button class="car_btn2 js-zoom js-down js-right"> <img class="imgb" src="svg/expand.svg"
                   onmouseenter="this.src =`svg/maxiz.gif`;" onmouseout="this.src =`svg/expand.svg`;"
                   alt="something pithy"></button>
               <div class="slider__inner">
@@ -178,19 +177,28 @@
           <span class="panel__nav panel__nav--down js-down">down</span>
         </div>
 
-        <div class="panel" data-x-pos="1" data-y-pos="1">
+        <div class="containers panel" data-x-pos="1" data-y-pos="1">
+          <div class="container container--ph">
+            
+              <div class="angles"></div>
+              <h class="h7">"Proficency<br>Natural curiosity</br><br>Visual Aesthetic</br> Minimalist <br>Human"</br>
+              </h>
+              <button class="car_btn js-zoom js-down js-left"> <img class="imgb" src="svg/expand.svg"
+                  onmouseenter="this.src =`svg/maxiz.gif`;" onmouseout="this.src =`svg/expand.svg`;"
+                  alt="something pithy"></button>
+              <br id="concept" class="concept"></br>
+              
+            </div>
+
           <span class="panel__nav panel__nav--left-down js-down js-left">down/left</span>
           <span class="panel__nav panel__nav--left js-left">left</span>
           <span class="panel__nav panel__nav--down js-down">down</span>
           <h1>Up Right</h1>
+
         </div>
         <div class="panel" data-x-pos="-1" data-y-pos="0">
           <div class="container container--ph">
-
             <div class="slider2">
-
-
-
               <h class="h7">"If by chance<br>I have omitted anything more or less proper or necessary,</br><br> I beg
                 forgiveness </br> since there is no one who is without fault and circumspect <br>in all matters"</br>
               </h>
@@ -200,7 +208,6 @@
               <br id="concept" class="concept"></br>
               <div class="slider2__inner">
                 <div class="slider2__contents"><img class="img2" src="svg/fibonaccibpath.svg"></img>
-
                   <h5 class="slider2__caption"><br></br></h5>
                 </div>
               </div>
@@ -317,11 +324,14 @@
 
   <script src="./script.js"></script>
   <script src="./loader.js"></script>
+  <script src="./slidei.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"
     integrity="sha512-f8mwTB+Bs8a5c46DEm7HQLcJuHMBaH/UFlcgyetMqqkvTcYg4g5VXsYR71b3qC82lZytjNYvBj2pf0VekA9/FQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.16.1/TweenMax.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.12.1/plugins/CSSRulePlugin.min.js'></script>
+  <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
+  <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/CSSRulePlugin3.min.js"></script>
   <script src="https://unpkg.com/scrollreveal"></script>
   <script>
     ScrollReveal().reveal('.headline');
