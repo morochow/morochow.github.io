@@ -105,3 +105,5 @@ $("#button").on("click", function () {
   // You may want to add more logic here if needed
   window.location.href = "./index.html";
 });
+
+// LIFE
