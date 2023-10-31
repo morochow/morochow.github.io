@@ -30,7 +30,7 @@ body {
 }
 
 *::-moz-focus-inner {
-  border: 0;
+  border: transparent;
 }
 
 @font-face {
@@ -63,7 +63,7 @@ body {
 
 .containerblur {
   filter: blur(1.618px);
-  transition: filter 0.5s ease;
+  transition: filter 1.618s ease;
 
 }
 .containerblur:focus {
