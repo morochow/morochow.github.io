@@ -147,3 +147,16 @@ function zoomIn(){
 document.addEventListener('touchmove', function(event) {
   event.preventDefault();
 }, { passive: false });
+
+const containers = document.querySelectorAll('.containerblur');
+
+containers.forEach(container => {
+  container.addEventListener('focus', () => {
+    container.style.filter = 'none';
+  });
+
+  container.addEventListener('blur', () => {
+    container.style.filter = 'blur(5px)';
+    });
+    
+});
