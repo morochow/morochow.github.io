@@ -1,4 +1,4 @@
-html, body {
+body {
   background-color: #ffffff;
   background-repeat: repeat;
   color: #acb1ba;
@@ -26,7 +26,7 @@ html, body {
 }
 
 *:focus {
-  outline: none;
+  outline: transparent;
 }
 
 *::-moz-focus-inner {
@@ -62,7 +62,7 @@ html, body {
 }
 
 .containerblur {
-    filter: blur(1.618px);
+  filter: blur(1.618px);
   transition: filter 0.5s ease;
 
 }
