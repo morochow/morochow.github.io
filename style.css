@@ -220,7 +220,7 @@ h6 {
   font-size: 0.618rem;
   font-family: "Nordstern";
   opacity: 0.8;
-  top: calc(100vh - 10em);
+  top: calc(100vh - 15em);
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
@@ -295,7 +295,7 @@ br .concept {
 
 .panel__nav {
   cursor: pointer;
-  opacity: 0.2;
+  opacity: 0.5;
   position: absolute;
   transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
   user-select: none;
