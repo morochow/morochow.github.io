@@ -143,3 +143,7 @@ function zoomIn(){
   }
   removeClass(site, 'show-all');
 }
+
+document.addEventListener('touchmove', function(event) {
+  event.preventDefault();
+}, { passive: false });
