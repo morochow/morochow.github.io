@@ -124,7 +124,6 @@ body {
 }
 
 h1 {
-  
   font-weight: 100;
   margin: 0;
 }
@@ -179,7 +178,7 @@ h1 {
   position: absolute;
   text-align: center;
   padding-left: 0.5rem;
-  top: 52%;
+  top: 53vh;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
