@@ -189,7 +189,7 @@ h2 {
   position: absolute;
   text-align: center;
   padding-left: 0.5rem;
-  top: 8.5%;
+  top: 8vh;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
@@ -532,3 +532,8 @@ html * {
   z-index: 99999;
 }
 
+@media (max-width: 768px) {
+  .flex-container {
+    height: 80vh; /* Change height for smaller screens */
+  }
+}
