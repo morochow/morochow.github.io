@@ -118,8 +118,8 @@ body {
 }
 
 .panel-wrap {
-  height: 100vh;
-  width: 100vw;
+  height: 90vh;
+  width: 90vw;
 
 }
 
@@ -189,7 +189,7 @@ h2 {
   position: absolute;
   text-align: center;
   padding-left: 0.5rem;
-  top: 5.5%;
+  top: 8.5%;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
