@@ -66,6 +66,7 @@ body {
   transition: filter 1.618s ease;
 
 }
+
 .containerblur:focus {
   filter: none;
 }
@@ -534,6 +535,7 @@ html * {
 
 @media (max-width: 768px) {
   .flex-container {
-    height: 80vh; /* Change height for smaller screens */
+    height: 80vh;
+    /* Change height for smaller screens */
   }
 }
