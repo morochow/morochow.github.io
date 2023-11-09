@@ -64,6 +64,7 @@ body {
 .containerblur {
   filter: blur(1.618px);
   transition: filter 1.618s ease;
+  z-index: 99999;
 
 }
 
@@ -535,7 +536,16 @@ html * {
 
 @media (max-width: 768px) {
   .flex-container {
-    height: 80vh;
+    height: 90%;
+    width: 90%;
+    /* Change height for smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .site-wrap {
+    height: 90%;
+    width: 90%;
     /* Change height for smaller screens */
   }
 }
