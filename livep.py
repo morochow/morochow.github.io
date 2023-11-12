@@ -27,12 +27,6 @@ coinmarketcap_api_key = os.environ.get('COINMARKETCAP_API_KEY', 'e75fb4c4-0e8c-4
 # Binance client setup
 client = Client(api_key, api_secret)
 
-# Get the server's timestamp
-server_time = client.get_server_time()
-
-# Use the server's timestamp for your request
-request_timestamp = server_time['serverTime']
-
 def get_symbol_klines(symbol, interval, limit):
     klines = client.get_klines(symbol=symbol, interval=interval, limit=limit)
     df = pd.DataFrame(klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
@@ -173,8 +167,10 @@ def place_order(symbol, side, quantity):
             symbol=symbol,
             side=side,
             type='MARKET',
-            quantity=quantity
-        )
+            quantity=quantity,
+            timestamp=server_time['serverTime']  # Pass the server time as the timestamp
+    )
+
         return order
     except Exception as e:
         logger.error(f"Error placing order: {e}")
@@ -187,8 +183,10 @@ def place_buy_order(symbol, quantity):
         symbol=symbol,
         side=Client.SIDE_BUY,
         type=Client.ORDER_TYPE_MARKET,
-        quantity=quantity
+        quantity=quantity,
+        timestamp=server_time['serverTime']  # Pass the server time as the timestamp
     )
+    
     return order
 
 def place_sell_order(symbol, quantity):
@@ -198,8 +196,10 @@ def place_sell_order(symbol, quantity):
         symbol=symbol,
         side=Client.SIDE_SELL,
         type=Client.ORDER_TYPE_MARKET,
-        quantity=quantity
+        quantity=quantity,
+        timestamp=server_time['serverTime']  # Pass the server time as the timestamp
     )
+
     return order
 
 def get_user_input():
@@ -254,8 +254,8 @@ def main():
     symbol_to_trade, interval, window_size, investment_amount = get_user_input()
 
     start_time = time.time()
-    executed_order = False
-
+    executed_order = False  # Track whether a buy/sell order has been executed
+    
     while not executed_order:
         try:
             elapsed_time = time.time() - start_time
@@ -275,6 +275,7 @@ def main():
 
             if len(np.unique(y_train)) > 1:
                 logistic_regression_model = train_logistic_regression(X_train, y_train)
+                # Inside the main function
                 chosen_strategy, action = choose_strategy(klines, logistic_regression_model, scaler, symbol_to_trade, features_to_use)
 
                 print("\nAnalysis Results:")
@@ -299,11 +300,14 @@ def main():
                     place_sell_order(symbol_to_trade, quantity_to_sell)
                     print(f"Sell order placed for {quantity_to_sell} {symbol_to_trade} at {current_price}")
                     executed_order = True  # Set the flag to exit the loop after a sell order
+                    
+            print("Progress: Fetching and analyzing data. Sleeping for a minute ...")
+            time.sleep(60)
 
         except Exception as e:
             logger.error(f"An error occurred: {e}")
-            print("Progress: Sleeping for 60 seconds...")
+            print("Progress: Sleeping for a minute ...")
             time.sleep(60)
-    
+
 if __name__ == "__main__":
     main()
