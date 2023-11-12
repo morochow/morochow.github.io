@@ -26,6 +26,7 @@ coinmarketcap_api_key = os.environ.get('COINMARKETCAP_API_KEY', 'e75fb4c4-0e8c-4
 
 # Binance client setup
 client = Client(api_key, api_secret)
+server_time = client.get_server_time()
 
 def get_symbol_klines(symbol, interval, limit):
     klines = client.get_klines(symbol=symbol, interval=interval, limit=limit)
