@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 import base64
 import hashlib
+import itertools
 import secrets
-import sys
 
 
 __all__ = ["accept_key", "apply_mask"]
@@ -25,8 +23,7 @@ def accept_key(key: str) -> str:
     """
     Compute the value of the Sec-WebSocket-Accept header.
 
-    Args:
-        key: value of the Sec-WebSocket-Key header.
+    :param key: value of the Sec-WebSocket-Key header
 
     """
     sha1 = hashlib.sha1((key + GUID).encode()).digest()
@@ -37,15 +34,11 @@ def apply_mask(data: bytes, mask: bytes) -> bytes:
     """
     Apply masking to the data of a WebSocket message.
 
-    Args:
-        data: data to mask.
-        mask: 4-bytes mask.
+    :param data: Data to mask
+    :param mask: 4-bytes mask
 
     """
     if len(mask) != 4:
         raise ValueError("mask must contain 4 bytes")
 
-    data_int = int.from_bytes(data, sys.byteorder)
-    mask_repeated = mask * (len(data) // 4) + mask[: len(data) % 4]
-    mask_int = int.from_bytes(mask_repeated, sys.byteorder)
-    return (data_int ^ mask_int).to_bytes(len(data), sys.byteorder)
+    return bytes(b ^ m for b, m in zip(data, itertools.cycle(mask)))

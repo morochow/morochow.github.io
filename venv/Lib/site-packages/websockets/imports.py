@@ -1,5 +1,4 @@
-from __future__ import annotations
-
+import sys
 import warnings
 from typing import Any, Dict, Iterable, Optional
 
@@ -9,15 +8,15 @@ __all__ = ["lazy_import"]
 
 def import_name(name: str, source: str, namespace: Dict[str, Any]) -> Any:
     """
-    Import ``name`` from ``source`` in ``namespace``.
+    Import <name> from <source> in <namespace>.
 
-    There are two use cases:
+    There are two cases:
 
-    - ``name`` is an object defined in ``source``;
-    - ``name`` is a submodule of ``source``.
+    - <name> is an object defined in <source>
+    - <name> is a submodule of source
 
-    Neither :func:`__import__` nor :func:`~importlib.import_module` does
-    exactly this. :func:`__import__` is closer to the intended behavior.
+    Neither __import__ nor importlib.import_module does exactly this.
+    __import__ is closer to the intended behavior.
 
     """
     level = 0
@@ -49,7 +48,10 @@ def lazy_import(
             }
         )
 
-    This function defines ``__getattr__`` and ``__dir__`` per :pep:`562`.
+    This function defines __getattr__ and __dir__ per PEP 562.
+
+    On Python 3.6 and earlier, it falls back to non-lazy imports and doesn't
+    raise deprecation warnings.
 
     """
     if aliases is None:
@@ -67,33 +69,43 @@ def lazy_import(
 
     package = namespace["__name__"]
 
-    def __getattr__(name: str) -> Any:
-        assert aliases is not None  # mypy cannot figure this out
-        try:
-            source = aliases[name]
-        except KeyError:
-            pass
-        else:
-            return import_name(name, source, namespace)
+    if sys.version_info[:2] >= (3, 7):
 
-        assert deprecated_aliases is not None  # mypy cannot figure this out
-        try:
-            source = deprecated_aliases[name]
-        except KeyError:
-            pass
-        else:
-            warnings.warn(
-                f"{package}.{name} is deprecated",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            return import_name(name, source, namespace)
+        def __getattr__(name: str) -> Any:
+            assert aliases is not None  # mypy cannot figure this out
+            try:
+                source = aliases[name]
+            except KeyError:
+                pass
+            else:
+                return import_name(name, source, namespace)
 
-        raise AttributeError(f"module {package!r} has no attribute {name!r}")
+            assert deprecated_aliases is not None  # mypy cannot figure this out
+            try:
+                source = deprecated_aliases[name]
+            except KeyError:
+                pass
+            else:
+                warnings.warn(
+                    f"{package}.{name} is deprecated",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                return import_name(name, source, namespace)
 
-    namespace["__getattr__"] = __getattr__
+            raise AttributeError(f"module {package!r} has no attribute {name!r}")
 
-    def __dir__() -> Iterable[str]:
-        return sorted(namespace_set | aliases_set | deprecated_aliases_set)
+        namespace["__getattr__"] = __getattr__
 
-    namespace["__dir__"] = __dir__
+        def __dir__() -> Iterable[str]:
+            return sorted(namespace_set | aliases_set | deprecated_aliases_set)
+
+        namespace["__dir__"] = __dir__
+
+    else:  # pragma: no cover
+
+        for name, source in aliases.items():
+            namespace[name] = import_name(name, source, namespace)
+
+        for name, source in deprecated_aliases.items():
+            namespace[name] = import_name(name, source, namespace)

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import asyncio
 import re
 from typing import Tuple
@@ -10,8 +8,8 @@ from ..exceptions import SecurityError
 
 __all__ = ["read_request", "read_response"]
 
-MAX_HEADERS = 128
-MAX_LINE = 8192
+MAX_HEADERS = 256
+MAX_LINE = 4110
 
 
 def d(value: bytes) -> str:
@@ -22,7 +20,7 @@ def d(value: bytes) -> str:
     return value.decode(errors="backslashreplace")
 
 
-# See https://www.rfc-editor.org/rfc/rfc7230.html#appendix-B.
+# See https://tools.ietf.org/html/rfc7230#appendix-B.
 
 # Regex for validating header names.
 
@@ -55,16 +53,13 @@ async def read_request(stream: asyncio.StreamReader) -> Tuple[str, Headers]:
     WebSocket handshake requests don't have one. If the request contains a
     body, it may be read from ``stream`` after this coroutine returns.
 
-    Args:
-        stream: Input to read the request from.
-
-    Raises:
-        EOFError: If the connection is closed without a full HTTP request.
-        SecurityError: If the request exceeds a security limit.
-        ValueError: If the request isn't well formatted.
+    :param stream: input to read the request from
+    :raises EOFError: if the connection is closed without a full HTTP request
+    :raises SecurityError: if the request exceeds a security limit
+    :raises ValueError: if the request isn't well formatted
 
     """
-    # https://www.rfc-editor.org/rfc/rfc7230.html#section-3.1.1
+    # https://tools.ietf.org/html/rfc7230#section-3.1.1
 
     # Parsing is simple because fixed values are expected for method and
     # version and because path isn't checked. Since WebSocket software tends
@@ -102,16 +97,13 @@ async def read_response(stream: asyncio.StreamReader) -> Tuple[int, str, Headers
     WebSocket handshake responses don't have one. If the response contains a
     body, it may be read from ``stream`` after this coroutine returns.
 
-    Args:
-        stream: Input to read the response from.
-
-    Raises:
-        EOFError: If the connection is closed without a full HTTP response.
-        SecurityError: If the response exceeds a security limit.
-        ValueError: If the response isn't well formatted.
+    :param stream: input to read the response from
+    :raises EOFError: if the connection is closed without a full HTTP response
+    :raises SecurityError: if the response exceeds a security limit
+    :raises ValueError: if the response isn't well formatted
 
     """
-    # https://www.rfc-editor.org/rfc/rfc7230.html#section-3.1.2
+    # https://tools.ietf.org/html/rfc7230#section-3.1.2
 
     # As in read_request, parsing is simple because a fixed value is expected
     # for version, status_code is a 3-digit number, and reason can be ignored.
@@ -150,7 +142,7 @@ async def read_headers(stream: asyncio.StreamReader) -> Headers:
     Non-ASCII characters are represented with surrogate escapes.
 
     """
-    # https://www.rfc-editor.org/rfc/rfc7230.html#section-3.2
+    # https://tools.ietf.org/html/rfc7230#section-3.2
 
     # We don't attempt to support obsolete line folding.
 
@@ -192,10 +184,10 @@ async def read_line(stream: asyncio.StreamReader) -> bytes:
     """
     # Security: this is bounded by the StreamReader's limit (default = 32 KiB).
     line = await stream.readline()
-    # Security: this guarantees header values are small (hard-coded = 8 KiB)
+    # Security: this guarantees header values are small (hard-coded = 4 KiB)
     if len(line) > MAX_LINE:
         raise SecurityError("line too long")
-    # Not mandatory but safe - https://www.rfc-editor.org/rfc/rfc7230.html#section-3.5
+    # Not mandatory but safe - https://tools.ietf.org/html/rfc7230#section-3.5
     if not line.endswith(b"\r\n"):
         raise EOFError("line without CRLF")
     return line[:-2]

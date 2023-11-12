@@ -1,23 +1,12 @@
-from __future__ import annotations
-
-import dataclasses
 import re
-import warnings
-from typing import Callable, Generator, Optional
+from typing import Callable, Generator, NamedTuple, Optional
 
-from . import datastructures, exceptions
+from .datastructures import Headers
+from .exceptions import SecurityError
 
 
-# Maximum total size of headers is around 128 * 8 KiB = 1 MiB.
-MAX_HEADERS = 128
-
-# Limit request line and header lines. 8KiB is the most common default
-# configuration of popular HTTP servers.
-MAX_LINE = 8192
-
-# Support for HTTP response bodies is intended to read an error message
-# returned by a server. It isn't designed to perform large file transfers.
-MAX_BODY = 2**20  # 1 MiB
+MAX_HEADERS = 256
+MAX_LINE = 4110
 
 
 def d(value: bytes) -> str:
@@ -28,7 +17,7 @@ def d(value: bytes) -> str:
     return value.decode(errors="backslashreplace")
 
 
-# See https://www.rfc-editor.org/rfc/rfc7230.html#appendix-B.
+# See https://tools.ietf.org/html/rfc7230#appendix-B.
 
 # Regex for validating header names.
 
@@ -48,61 +37,45 @@ _token_re = re.compile(rb"[-!#$%&\'*+.^_`|~0-9a-zA-Z]+")
 _value_re = re.compile(rb"[\x09\x20-\x7e\x80-\xff]*")
 
 
-@dataclasses.dataclass
-class Request:
+# Consider converting to dataclasses when dropping support for Python < 3.7.
+
+
+class Request(NamedTuple):
     """
     WebSocket handshake request.
 
-    Attributes:
-        path: Request path, including optional query.
-        headers: Request headers.
+    :param path: path and optional query
+    :param headers:
     """
 
     path: str
-    headers: datastructures.Headers
-    # body isn't useful is the context of this library.
-
-    _exception: Optional[Exception] = None
-
-    @property
-    def exception(self) -> Optional[Exception]:  # pragma: no cover
-        warnings.warn(
-            "Request.exception is deprecated; "
-            "use ServerProtocol.handshake_exc instead",
-            DeprecationWarning,
-        )
-        return self._exception
+    headers: Headers
+    # body isn't useful is the context of this library
 
     @classmethod
     def parse(
-        cls,
-        read_line: Callable[[int], Generator[None, None, bytes]],
-    ) -> Generator[None, None, Request]:
+        cls, read_line: Callable[[], Generator[None, None, bytes]]
+    ) -> Generator[None, None, "Request"]:
         """
-        Parse a WebSocket handshake request.
+        Parse an HTTP/1.1 GET request and return ``(path, headers)``.
 
-        This is a generator-based coroutine.
+        ``path`` isn't URL-decoded or validated in any way.
 
-        The request path isn't URL-decoded or validated in any way.
+        ``path`` and ``headers`` are expected to contain only ASCII characters.
+        Other characters are represented with surrogate escapes.
 
-        The request path and headers are expected to contain only ASCII
-        characters. Other characters are represented with surrogate escapes.
-
-        :meth:`parse` doesn't attempt to read the request body because
+        :func:`parse_request` doesn't attempt to read the request body because
         WebSocket handshake requests don't have one. If the request contains a
-        body, it may be read from the data stream after :meth:`parse` returns.
+        body, it may be read from ``stream`` after this coroutine returns.
 
-        Args:
-            read_line: generator-based coroutine that reads a LF-terminated
-                line or raises an exception if there isn't enough data
-
-        Raises:
-            EOFError: if the connection is closed without a full HTTP request.
-            SecurityError: if the request exceeds a security limit.
-            ValueError: if the request isn't well formatted.
+        :param read_line: generator-based coroutine that reads a LF-terminated
+            line or raises an exception if there isn't enough data
+        :raises EOFError: if the connection is closed without a full HTTP request
+        :raises SecurityError: if the request exceeds a security limit
+        :raises ValueError: if the request isn't well formatted
 
         """
-        # https://www.rfc-editor.org/rfc/rfc7230.html#section-3.1.1
+        # https://tools.ietf.org/html/rfc7230#section-3.1.1
 
         # Parsing is simple because fixed values are expected for method and
         # version and because path isn't checked. Since WebSocket software tends
@@ -126,88 +99,68 @@ class Request:
 
         headers = yield from parse_headers(read_line)
 
-        # https://www.rfc-editor.org/rfc/rfc7230.html#section-3.3.3
-
-        if "Transfer-Encoding" in headers:
-            raise NotImplementedError("transfer codings aren't supported")
-
-        if "Content-Length" in headers:
-            raise ValueError("unsupported request body")
-
         return cls(path, headers)
 
     def serialize(self) -> bytes:
         """
-        Serialize a WebSocket handshake request.
+        Serialize an HTTP/1.1 GET request.
 
         """
-        # Since the request line and headers only contain ASCII characters,
+        # Since the path and headers only contain ASCII characters,
         # we can keep this simple.
         request = f"GET {self.path} HTTP/1.1\r\n".encode()
         request += self.headers.serialize()
         return request
 
 
-@dataclasses.dataclass
-class Response:
+# Consider converting to dataclasses when dropping support for Python < 3.7.
+
+
+class Response(NamedTuple):
     """
     WebSocket handshake response.
-
-    Attributes:
-        status_code: Response code.
-        reason_phrase: Response reason.
-        headers: Response headers.
-        body: Response body, if any.
 
     """
 
     status_code: int
     reason_phrase: str
-    headers: datastructures.Headers
+    headers: Headers
     body: Optional[bytes] = None
 
-    _exception: Optional[Exception] = None
-
-    @property
-    def exception(self) -> Optional[Exception]:  # pragma: no cover
-        warnings.warn(
-            "Response.exception is deprecated; "
-            "use ClientProtocol.handshake_exc instead",
-            DeprecationWarning,
-        )
-        return self._exception
+    # If processing the response triggers an exception, it's stored here.
+    exception: Optional[Exception] = None
 
     @classmethod
     def parse(
         cls,
-        read_line: Callable[[int], Generator[None, None, bytes]],
+        read_line: Callable[[], Generator[None, None, bytes]],
         read_exact: Callable[[int], Generator[None, None, bytes]],
-        read_to_eof: Callable[[int], Generator[None, None, bytes]],
-    ) -> Generator[None, None, Response]:
+        read_to_eof: Callable[[], Generator[None, None, bytes]],
+    ) -> Generator[None, None, "Response"]:
         """
-        Parse a WebSocket handshake response.
+        Parse an HTTP/1.1 response and return ``(status_code, reason, headers)``.
 
-        This is a generator-based coroutine.
+        ``reason`` and ``headers`` are expected to contain only ASCII characters.
+        Other characters are represented with surrogate escapes.
 
-        The reason phrase and headers are expected to contain only ASCII
-        characters. Other characters are represented with surrogate escapes.
+        :func:`parse_request` doesn't attempt to read the response body because
+        WebSocket handshake responses don't have one. If the response contains a
+        body, it may be read from ``stream`` after this coroutine returns.
 
-        Args:
-            read_line: generator-based coroutine that reads a LF-terminated
-                line or raises an exception if there isn't enough data.
-            read_exact: generator-based coroutine that reads the requested
-                bytes or raises an exception if there isn't enough data.
-            read_to_eof: generator-based coroutine that reads until the end
-                of the stream.
-
-        Raises:
-            EOFError: if the connection is closed without a full HTTP response.
-            SecurityError: if the response exceeds a security limit.
-            LookupError: if the response isn't well formatted.
-            ValueError: if the response isn't well formatted.
+        :param read_line: generator-based coroutine that reads a LF-terminated
+            line or raises an exception if there isn't enough data
+        :param read_exact: generator-based coroutine that reads the requested
+            number of bytes or raises an exception if there isn't enough data
+        :raises EOFError: if the connection is closed without a full HTTP response
+        :raises SecurityError: if the response exceeds a security limit
+        :raises LookupError: if the response isn't well formatted
+        :raises ValueError: if the response isn't well formatted
 
         """
-        # https://www.rfc-editor.org/rfc/rfc7230.html#section-3.1.2
+        # https://tools.ietf.org/html/rfc7230#section-3.1.2
+
+        # As in parse_request, parsing is simple because a fixed value is expected
+        # for version, status_code is a 3-digit number, and reason can be ignored.
 
         try:
             status_line = yield from parse_line(read_line)
@@ -235,7 +188,7 @@ class Response:
 
         headers = yield from parse_headers(read_line)
 
-        # https://www.rfc-editor.org/rfc/rfc7230.html#section-3.3.3
+        # https://tools.ietf.org/html/rfc7230#section-3.3.3
 
         if "Transfer-Encoding" in headers:
             raise NotImplementedError("transfer codings aren't supported")
@@ -257,16 +210,7 @@ class Response:
                 content_length = int(raw_content_length)
 
             if content_length is None:
-                try:
-                    body = yield from read_to_eof(MAX_BODY)
-                except RuntimeError:
-                    raise exceptions.SecurityError(
-                        f"body too large: over {MAX_BODY} bytes"
-                    )
-            elif content_length > MAX_BODY:
-                raise exceptions.SecurityError(
-                    f"body too large: {content_length} bytes"
-                )
+                body = yield from read_to_eof()
             else:
                 body = yield from read_exact(content_length)
 
@@ -274,7 +218,7 @@ class Response:
 
     def serialize(self) -> bytes:
         """
-        Serialize a WebSocket handshake response.
+        Serialize an HTTP/1.1 GET response.
 
         """
         # Since the status line and headers only contain ASCII characters,
@@ -287,28 +231,22 @@ class Response:
 
 
 def parse_headers(
-    read_line: Callable[[int], Generator[None, None, bytes]],
-) -> Generator[None, None, datastructures.Headers]:
+    read_line: Callable[[], Generator[None, None, bytes]]
+) -> Generator[None, None, Headers]:
     """
     Parse HTTP headers.
 
     Non-ASCII characters are represented with surrogate escapes.
 
-    Args:
-        read_line: generator-based coroutine that reads a LF-terminated line
-            or raises an exception if there isn't enough data.
-
-    Raises:
-        EOFError: if the connection is closed without complete headers.
-        SecurityError: if the request exceeds a security limit.
-        ValueError: if the request isn't well formatted.
+    :param read_line: generator-based coroutine that reads a LF-terminated
+        line or raises an exception if there isn't enough data
 
     """
-    # https://www.rfc-editor.org/rfc/rfc7230.html#section-3.2
+    # https://tools.ietf.org/html/rfc7230#section-3.2
 
     # We don't attempt to support obsolete line folding.
 
-    headers = datastructures.Headers()
+    headers = Headers()
     for _ in range(MAX_HEADERS + 1):
         try:
             line = yield from parse_line(read_line)
@@ -332,33 +270,29 @@ def parse_headers(
         headers[name] = value
 
     else:
-        raise exceptions.SecurityError("too many HTTP headers")
+        raise SecurityError("too many HTTP headers")
 
     return headers
 
 
 def parse_line(
-    read_line: Callable[[int], Generator[None, None, bytes]],
+    read_line: Callable[[], Generator[None, None, bytes]]
 ) -> Generator[None, None, bytes]:
     """
     Parse a single line.
 
     CRLF is stripped from the return value.
 
-    Args:
-        read_line: generator-based coroutine that reads a LF-terminated line
-            or raises an exception if there isn't enough data.
-
-    Raises:
-        EOFError: if the connection is closed without a CRLF.
-        SecurityError: if the response exceeds a security limit.
+    :param read_line: generator-based coroutine that reads a LF-terminated
+        line or raises an exception if there isn't enough data
 
     """
-    try:
-        line = yield from read_line(MAX_LINE)
-    except RuntimeError:
-        raise exceptions.SecurityError("line too long")
-    # Not mandatory but safe - https://www.rfc-editor.org/rfc/rfc7230.html#section-3.5
+    # Security: TODO: add a limit here
+    line = yield from read_line()
+    # Security: this guarantees header values are small (hard-coded = 4 KiB)
+    if len(line) > MAX_LINE:
+        raise SecurityError("line too long")
+    # Not mandatory but safe - https://tools.ietf.org/html/rfc7230#section-3.5
     if not line.endswith(b"\r\n"):
         raise EOFError("line without CRLF")
     return line[:-2]
