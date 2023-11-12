@@ -162,13 +162,53 @@ def get_current_price(symbol):
     current_price = float(ticker['price'])
     return current_price
 
+def format_quantity(quantity, symbol_info):
+    # Adjust the quantity to match the asset's allowed precision
+    step_size = float([f['stepSize'] for f in symbol_info['filters'] if f['filterType'] == 'LOT_SIZE'][0])
+    precision = int(round(-math.log(step_size, 10), 0))
+    return "{:0.0{}f}".format(quantity, precision)
+
+def place_buy_order(symbol, quantity):
+    try:
+        symbol_info = client.get_symbol_info(symbol)
+        formatted_quantity = format_quantity(quantity, symbol_info)
+
+        order = client.create_order(
+            symbol=symbol,
+            side=Client.SIDE_BUY,
+            type=Client.ORDER_TYPE_MARKET,
+            quantity=formatted_quantity,
+            timestamp=server_time['serverTime']
+        )
+        return order
+    except Exception as e:
+        logger.error(f"Error placing buy order: {e}")
+        return None
+
+def place_sell_order(symbol, quantity):
+    try:
+        symbol_info = client.get_symbol_info(symbol)
+        formatted_quantity = format_quantity(quantity, symbol_info)
+
+        order = client.create_order(
+            symbol=symbol,
+            side=Client.SIDE_SELL,
+            type=Client.ORDER_TYPE_MARKET,
+            quantity=formatted_quantity,
+            timestamp=server_time['serverTime']
+        )
+        return order
+    except Exception as e:
+        logger.error(f"Error placing sell order: {e}")
+        return None
+
 def place_order(symbol, side, quantity):
     try:
         order = client.create_order(
             symbol=symbol,
             side=side,
             type='MARKET',
-            quantity=quantity,
+            quantity=formatted_quantity,
             timestamp=server_time['serverTime']  # Pass the server time as the timestamp
     )
 
@@ -177,31 +217,6 @@ def place_order(symbol, side, quantity):
         logger.error(f"Error placing order: {e}")
         return None
 
-def place_buy_order(symbol, quantity):
-    # Replace with your implementation to place a buy order
-    # Example for Binance API:
-    order = client.create_order(
-        symbol=symbol,
-        side=Client.SIDE_BUY,
-        type=Client.ORDER_TYPE_MARKET,
-        quantity=quantity,
-        timestamp=server_time['serverTime']  # Pass the server time as the timestamp
-    )
-    
-    return order
-
-def place_sell_order(symbol, quantity):
-    # Replace with your implementation to place a sell order
-    # Example for Binance API:
-    order = client.create_order(
-        symbol=symbol,
-        side=Client.SIDE_SELL,
-        type=Client.ORDER_TYPE_MARKET,
-        quantity=quantity,
-        timestamp=server_time['serverTime']  # Pass the server time as the timestamp
-    )
-
-    return order
 
 def get_user_input():
     symbol_to_trade = input("Enter the trading pair (e.g., BTCUSDT): ").upper()
