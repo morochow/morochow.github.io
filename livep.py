@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+import math
 import pandas as pd
 import numpy as np
 import talib
@@ -14,15 +15,34 @@ from binance.client import Client
 from bokeh.plotting import figure, show
 from bokeh.models import Range1d
 from bokeh.io import output_notebook
+import joblib
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
+class CustomLoggingHandler(logging.StreamHandler):
+    def emit(self, record):
+        if record.levelno == logging.ERROR:
+            self.stream.write(RED)
+        super().emit(record)
+        self.stream.write(RESET)
+
+# Set up logging with custom handler
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = CustomLoggingHandler()
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 # API keys and other sensitive information should be kept in environment variables
 api_key = os.environ.get('BINANCE_API_KEY', 'Bq1Ms14chZFI1Gk2oTHkDhnks3eQ8Y76QoyIu5yTzX8207jnkMwNfavpJTwB3FLP')
 api_secret = os.environ.get('BINANCE_API_SECRET', 'YttOvLnZvXCDvCUaYmqHbgrcq8SEk8hxPiAsOcS6y4hxk2aki2dnvctKzLPa0zUi')
 coinmarketcap_api_key = os.environ.get('COINMARKETCAP_API_KEY', 'e75fb4c4-0e8c-49e5-b18c-941df88edc0b')
+
+GREEN = '\033[92m'  # Green text
+BLUE = '\033[94m'   # Blue text
+YELLOW = '\033[93m' # Yellow text
+RED = '\033[91m' # Red text
+PURPLE = '\033[95m'
+RESET = '\033[0m'   # Reset to default color
 
 # Binance client setup
 client = Client(api_key, api_secret)
@@ -162,6 +182,23 @@ def get_current_price(symbol):
     current_price = float(ticker['price'])
     return current_price
 
+KNOWN_QUOTE_ASSETS = ["USDT", "BTC", "ETH", "BNB", "XRP", "LTC", "ADA", "DOT", "BCH", "LINK"]  # Add more as needed
+
+def get_quote_asset(trading_pair):
+    for quote_asset in KNOWN_QUOTE_ASSETS:
+        if trading_pair.endswith(quote_asset):
+            return quote_asset
+    return None  # or raise an error if no known quote asset is found
+
+def get_asset_balance(asset):
+    try:
+        balance = client.get_asset_balance(asset=asset)
+        return float(balance['free'])  # 'free' is the amount available for trading
+    except Exception as e:
+        logger.error(f"Error fetching balance for {asset}: {e}")
+        return 0
+
+
 def format_quantity(quantity, symbol_info):
     # Adjust the quantity to match the asset's allowed precision
     step_size = float([f['stepSize'] for f in symbol_info['filters'] if f['filterType'] == 'LOT_SIZE'][0])
@@ -204,13 +241,16 @@ def place_sell_order(symbol, quantity):
 
 def place_order(symbol, side, quantity):
     try:
+        symbol_info = client.get_symbol_info(symbol)
+        formatted_quantity = format_quantity(quantity, symbol_info)  # Define formatted_quantity here
+
         order = client.create_order(
             symbol=symbol,
             side=side,
             type='MARKET',
             quantity=formatted_quantity,
             timestamp=server_time['serverTime']  # Pass the server time as the timestamp
-    )
+        )
 
         return order
     except Exception as e:
@@ -279,12 +319,40 @@ def default_strategy_decision(logistic_regression_signal, lorentzian_signal, mom
 
     return chosen_strategy, action
 
+def get_last_5min_market_data(symbol):
+    try:
+        klines = client.get_klines(symbol=symbol, interval=Client.KLINE_INTERVAL_5MINUTE, limit=1)
+        last_kline = klines[-1]  # Get the latest kline
+        high_price = last_kline[2]  # High price is the 3rd element
+        low_price = last_kline[3]  # Low price is the 4th element
+        return high_price, low_price
+    except Exception as e:
+        logger.error(f"Error fetching last 5-minute market data: {e}")
+        return None, None
+
+
+def train_random_forest(X_train, y_train):
+    model = RandomForestRegressor(n_estimators=100)
+    model.fit(X_train, y_train)
+    return model
+
+def make_trading_decision(df, rf_model):
+    current_data = df[-1:]  # Using the latest data point
+    prediction = rf_model.predict(current_data)[0]
+    current_price = df['close'].iloc[-1]
+    if prediction > current_price * 1.01:  # Example threshold
+        return "Buy"
+    elif prediction < current_price * 0.99:  # Example threshold
+        return "Sell"
+    else:
+        return "Hold"
 
 def main():
-    print("Welcome to the Trading Bot!")
+    print("Trading Bot v.1 TETRAHEDRON ALPHA")
 
     symbol_to_trade, interval, window_size, investment_amount = get_user_input()
-
+    quote_asset = get_quote_asset(symbol_to_trade)
+    
     executed_order = False  # Track whether a buy/sell order has been executed
     
     coinmarketcap_data = get_coinmarketcap_data(coinmarketcap_api_key, symbol_to_trade)
@@ -295,7 +363,13 @@ def main():
         market_data['percent_change_24h'] = coinmarketcap_data.get('quote', {}).get('USD', {}).get('percent_change_24h', 0)
         market_data['market_cap'] = coinmarketcap_data.get('quote', {}).get('USD', {}).get('market_cap', 0)
         print(f"CoinMarketCap Data for {symbol_to_trade}: {market_data}")
-        
+
+    try:
+        rf_model = joblib.load('random_forest_model.pkl')
+    except Exception as e:
+        logger.error(f"Error loading Random Forest model: {e}")
+        rf_model = None
+
     while not executed_order:
         try:
             start_time = time.time()
@@ -308,25 +382,35 @@ def main():
 
             if len(np.unique(y_train)) > 1:
                 logistic_regression_model = train_logistic_regression(X_train, y_train)
-                chosen_strategy, action = choose_strategy(klines, logistic_regression_model, scaler, symbol_to_trade, features_to_use, market_data)
+                use_rf = True  # Set this based on user input or another condition
+                if use_rf and rf_model is not None:
+                    action = make_trading_decision(klines, rf_model)
+                else:
+                    chosen_strategy, action = choose_strategy(klines, logistic_regression_model, scaler, symbol_to_trade, features_to_use, market_data)
 
-                print("\nAnalysis Results:")
-                print(f"Chosen Strategy: {chosen_strategy}")
-                print(f"Action: {action}")
+                print(f"{GREEN}\nAnalysis Results:{RESET}")
+                high, low = get_last_5min_market_data(symbol_to_trade)
+                if high is not None and low is not None:
+                    print(f"Last 5-minute {PURPLE}High:{RESET} {high}, {PURPLE}Low:{RESET} {low}")
+                if not use_rf:
+                    print(f"Chosen Strategy: {YELLOW}{chosen_strategy}{RESET}")
+                print(f"Action: {BLUE}{action}{RESET}")
                 
                 # Place buy or sell orders based on the action
                 current_price = get_current_price(symbol_to_trade)
                 if action == "Buy":
-                    quantity_to_buy = investment_amount / current_price
-                    place_buy_order(symbol_to_trade, quantity_to_buy)
-                    print(f"Buy order placed for {quantity_to_buy} {symbol_to_trade} at {current_price}")
-                    executed_order = True
+                    quote_asset_balance = get_asset_balance(quote_asset)
+                    if quote_asset_balance >= investment_amount:
+                        quantity_to_buy = investment_amount / current_price
+                        place_buy_order(symbol_to_trade, quantity_to_buy)
+                        print(f"Buy order placed for {quantity_to_buy} {symbol_to_trade} at {current_price}")
+                        executed_order = True
+                    else:
+                        print(f"{RED}Insufficient {quote_asset} balance to place buy order.{RESET}")
                 elif action == "Sell":
-                    quantity_to_sell = investment_amount / current_price
-                    place_sell_order(symbol_to_trade, quantity_to_sell)
-                    print(f"Sell order placed for {quantity_to_sell} {symbol_to_trade} at {current_price}")
-                    executed_order = True
-            
+                    # Implement sell logic here
+                    pass
+
             elapsed_time = time.time() - start_time
             print(f"\nElapsed Time: {elapsed_time:.2f} seconds")
         
