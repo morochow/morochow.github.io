@@ -289,6 +289,7 @@ def main():
     
     coinmarketcap_data = get_coinmarketcap_data(coinmarketcap_api_key, symbol_to_trade)
     market_data = {}
+    
     if coinmarketcap_data:
         # Extract relevant metrics
         market_data['volume_24h'] = coinmarketcap_data.get('quote', {}).get('USD', {}).get('volume_24h', 0)
