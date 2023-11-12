@@ -210,18 +210,34 @@ def get_user_input():
     investment_amount = float(input("Enter the amount to invest in trading ($): "))
     return symbol_to_trade, interval, window_size, investment_amount
 
-def choose_strategy(df, logistic_regression_model, scaler, symbol_to_trade, features_to_use):
+def choose_strategy(df, logistic_regression_model, scaler, symbol_to_trade, features_to_use, market_data):
     if len(df) <= 1:
         return "Insufficient data for strategy selection", "Hold"
 
     last_data = df[-1:].drop(columns=['target'])
-    
-    # Calculate signals
     last_data_scaled = scaler.transform(last_data[features_to_use])
     logistic_regression_signal = predict_and_trade(logistic_regression_model, last_data_scaled)
     lorentzian_signal = lorentzian_classification(df)
     momentum_signal = squeezed_momentum_indicator(df)
 
+    # Market data considerations
+    high_volatility = abs(market_data.get('percent_change_24h', 0)) > 5
+
+    # Strategy decision based on market data
+    if high_volatility:
+        if market_data['percent_change_24h'] > 0:
+            chosen_strategy = "High Volatility - Positive Change"
+            action = "Sell" if logistic_regression_signal > 0.5 else "Hold"
+        else:
+            chosen_strategy = "High Volatility - Negative Change"
+            action = "Buy" if logistic_regression_signal < 0.5 else "Hold"
+    else:
+        # Default strategy based on logistic regression and other indicators
+        chosen_strategy, action = default_strategy_decision(logistic_regression_signal, lorentzian_signal, momentum_signal)
+
+    return chosen_strategy, action
+
+def default_strategy_decision(logistic_regression_signal, lorentzian_signal, momentum_signal):
     # Define thresholds for each signal
     logistic_regression_threshold = 0.5  # Adjust as needed
     lorentzian_threshold = 0.5  # Adjust as needed
@@ -257,50 +273,46 @@ def main():
     start_time = time.time()
     executed_order = False  # Track whether a buy/sell order has been executed
     
+    coinmarketcap_data = get_coinmarketcap_data(coinmarketcap_api_key, symbol_to_trade)
+    market_data = {}
+    if coinmarketcap_data:
+        # Extract relevant metrics
+        market_data['volume_24h'] = coinmarketcap_data.get('quote', {}).get('USD', {}).get('volume_24h', 0)
+        market_data['percent_change_24h'] = coinmarketcap_data.get('quote', {}).get('USD', {}).get('percent_change_24h', 0)
+        market_data['market_cap'] = coinmarketcap_data.get('quote', {}).get('USD', {}).get('market_cap', 0)
+        print(f"CoinMarketCap Data for {symbol_to_trade}: {market_data}")
+        
     while not executed_order:
         try:
             elapsed_time = time.time() - start_time
             print(f"\nElapsed Time: {elapsed_time:.2f} seconds")
 
             klines = get_symbol_klines(symbol_to_trade, interval, 100)
-
-            estimated_time = elapsed_time * 1.5
-            print(f"Estimated Time for Fetching and Analyzing Data: {estimated_time:.2f} seconds")
-
             features, labels, features_to_use = prepare_data(klines, window=window_size)
-
             scaler = StandardScaler().fit(features)
-
             scaled_features = scaler.transform(features)
             X_train, _, y_train, _ = train_test_split(scaled_features, labels, test_size=0.2, random_state=42)
 
             if len(np.unique(y_train)) > 1:
                 logistic_regression_model = train_logistic_regression(X_train, y_train)
-                # Inside the main function
-                chosen_strategy, action = choose_strategy(klines, logistic_regression_model, scaler, symbol_to_trade, features_to_use)
+                chosen_strategy, action = choose_strategy(klines, logistic_regression_model, scaler, symbol_to_trade, features_to_use, market_data)
 
                 print("\nAnalysis Results:")
                 print(f"Chosen Strategy: {chosen_strategy}")
-                print(f"Logistic Regression Signal: {logistic_regression_model.predict([scaled_features[-1]])[0]}")
-                print(f"Lorentzian Signal: {lorentzian_classification(klines)}")
-                print(f"Squeezed Momentum Signal: {squeezed_momentum_indicator(klines)}")
-
                 print(f"Action: {action}")
                 
                 # Place buy or sell orders based on the action
                 current_price = get_current_price(symbol_to_trade)
                 if action == "Buy":
-                    # Calculate the quantity to buy based on the investment amount and current price
                     quantity_to_buy = investment_amount / current_price
                     place_buy_order(symbol_to_trade, quantity_to_buy)
                     print(f"Buy order placed for {quantity_to_buy} {symbol_to_trade} at {current_price}")
-                    executed_order = True  # Set the flag to exit the loop after a buy order
+                    executed_order = True
                 elif action == "Sell":
-                    # Calculate the quantity to sell based on the investment amount and current price
                     quantity_to_sell = investment_amount / current_price
                     place_sell_order(symbol_to_trade, quantity_to_sell)
                     print(f"Sell order placed for {quantity_to_sell} {symbol_to_trade} at {current_price}")
-                    executed_order = True  # Set the flag to exit the loop after a sell order
+                    executed_order = True
                     
             print("Progress: Fetching and analyzing data. Sleeping for a minute ...")
             time.sleep(60)
