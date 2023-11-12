@@ -270,7 +270,6 @@ def main():
 
     symbol_to_trade, interval, window_size, investment_amount = get_user_input()
 
-    start_time = time.time()
     executed_order = False  # Track whether a buy/sell order has been executed
     
     coinmarketcap_data = get_coinmarketcap_data(coinmarketcap_api_key, symbol_to_trade)
@@ -283,10 +282,9 @@ def main():
         print(f"CoinMarketCap Data for {symbol_to_trade}: {market_data}")
         
     while not executed_order:
+                        
         try:
-            elapsed_time = time.time() - start_time
-            print(f"\nElapsed Time: {elapsed_time:.2f} seconds")
-
+            start_time = time.time()
             klines = get_symbol_klines(symbol_to_trade, interval, 100)
             features, labels, features_to_use = prepare_data(klines, window=window_size)
             scaler = StandardScaler().fit(features)
@@ -313,7 +311,10 @@ def main():
                     place_sell_order(symbol_to_trade, quantity_to_sell)
                     print(f"Sell order placed for {quantity_to_sell} {symbol_to_trade} at {current_price}")
                     executed_order = True
-                    
+            
+            elapsed_time = time.time() - start_time
+            print(f"\nElapsed Time: {elapsed_time:.2f} seconds")
+        
             print("Progress: Fetching and analyzing data. Sleeping for a minute ...")
             time.sleep(60)
 
