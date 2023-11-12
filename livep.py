@@ -287,7 +287,6 @@ def main():
 
     executed_order = False  # Track whether a buy/sell order has been executed
     
-    # Fetch CoinMarketCap data
     coinmarketcap_data = get_coinmarketcap_data(coinmarketcap_api_key, symbol_to_trade)
     market_data = {}
     if coinmarketcap_data:
@@ -300,8 +299,7 @@ def main():
     while not executed_order:
         try:
             start_time = time.time()
-
-            # Fetch and prepare data
+            print("Progress: Fetching and analyzing data...")
             klines = get_symbol_klines(symbol_to_trade, interval, 100)
             features, labels, features_to_use = prepare_data(klines, window=window_size)
             scaler = StandardScaler().fit(features)
@@ -309,41 +307,37 @@ def main():
             X_train, _, y_train, _ = train_test_split(scaled_features, labels, test_size=0.2, random_state=42)
 
             if len(np.unique(y_train)) > 1:
-                # Train the model
                 logistic_regression_model = train_logistic_regression(X_train, y_train)
-
-                # Choose strategy based on analysis
                 chosen_strategy, action = choose_strategy(klines, logistic_regression_model, scaler, symbol_to_trade, features_to_use, market_data)
 
-                # Display analysis results
                 print("\nAnalysis Results:")
                 print(f"Chosen Strategy: {chosen_strategy}")
                 print(f"Action: {action}")
-
-                # Execute trading action
-                execute_trading_action(action, symbol_to_trade, investment_amount)
-
+                
+                # Place buy or sell orders based on the action
+                current_price = get_current_price(symbol_to_trade)
+                if action == "Buy":
+                    quantity_to_buy = investment_amount / current_price
+                    place_buy_order(symbol_to_trade, quantity_to_buy)
+                    print(f"Buy order placed for {quantity_to_buy} {symbol_to_trade} at {current_price}")
+                    executed_order = True
+                elif action == "Sell":
+                    quantity_to_sell = investment_amount / current_price
+                    place_sell_order(symbol_to_trade, quantity_to_sell)
+                    print(f"Sell order placed for {quantity_to_sell} {symbol_to_trade} at {current_price}")
+                    executed_order = True
+            
             elapsed_time = time.time() - start_time
             print(f"\nElapsed Time: {elapsed_time:.2f} seconds")
-
-            print("Progress: Fetching and analyzing data. Sleeping for a minute ...")
-            time.sleep(60)
+        
+            if not executed_order:
+                print("Sleeping for a minute before next analysis...")
+                time.sleep(60)
 
         except Exception as e:
             logger.error(f"An error occurred: {e}")
-            print("Progress: Sleeping for a minute ...")
+            print("Sleeping for a minute before retrying...")
             time.sleep(60)
-
-def execute_trading_action(action, symbol, investment_amount):
-    current_price = get_current_price(symbol)
-    if action == "Buy":
-        quantity_to_buy = investment_amount / current_price
-        place_buy_order(symbol, quantity_to_buy)
-        print(f"Buy order placed for {quantity_to_buy} {symbol} at {current_price}")
-    elif action == "Sell":
-        quantity_to_sell = investment_amount / current_price
-        place_sell_order(symbol, quantity_to_sell)
-        print(f"Sell order placed for {quantity_to_sell} {symbol} at {current_price}")
 
 if __name__ == "__main__":
     main()
