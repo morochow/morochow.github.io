@@ -1,38 +1,18 @@
 import pandas as pd
-import requests
+import talib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 import joblib
-import talib
+from tqdm import tqdm
+import time
+import numpy as np
 
-# Function to fetch data from CoinMarketCap
-def fetch_data(symbol, start_date, end_date, coinmarketcap_api_key):
-    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical"
-    parameters = {
-        'symbol': symbol,
-        'time_start': start_date,
-        'time_end': end_date,
-        'convert': 'USD'
-    }
-    headers = {
-        'Accepts': 'application/json',
-        'X-CMC_PRO_API_KEY': coinmarketcap_api_key,
-    }
-
-    response = requests.get(url, headers=headers, params=parameters)
-    data = response.json()
-
-    # Parse the data into a DataFrame
-    df = pd.DataFrame([{
-        'Open': day['quote']['USD']['open'],
-        'High': day['quote']['USD']['high'],
-        'Low': day['quote']['USD']['low'],
-        'Close': day['quote']['USD']['close'],
-        'Volume': day['quote']['USD']['volume']
-    } for day in data['data']['quotes']])
-
-    df.index = pd.to_datetime([day['time_open'] for day in data['data']['quotes']])
+# Function to load data from a CSV file
+def load_data(file_path):
+    df = pd.read_csv(file_path, sep=';', parse_dates=['timeOpen', 'timeClose', 'timeHigh', 'timeLow', 'timestamp'], dayfirst=True)
+    df.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}, inplace=True)
+    df.set_index('timeOpen', inplace=True)
     return df
 
 # Feature Engineering
@@ -60,11 +40,8 @@ def add_technical_indicators(df):
     return df
 
 # Load Data
-coinmarketcap_api_key = "e75fb4c4-0e8c-49e5-b18c-941df88edc0b"
-symbol = "BTCUSDT"  # Example symbol
-start_date = "2022-01-01"
-end_date = "2023-11-12"
-df = fetch_data(symbol, start_date, end_date, coinmarketcap_api_key)
+file_path = "Bitcoin_6_24_2010-8_23_2010_historical_data_coinmarketcap.csv"
+df = load_data(file_path)
 
 # Add technical indicators
 df = add_technical_indicators(df)
@@ -76,7 +53,7 @@ df['Target'] = (df['Close'].shift(-1) > df['Close']).astype(int)
 df.dropna(inplace=True)
 
 # Split data into features and target
-X = df.drop('Target', axis=1)
+X = df.drop('Target', axis=1).select_dtypes(include=[np.number])
 y = df['Target']
 
 # Split data into training and testing sets
@@ -84,11 +61,14 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Train Random Forest Classifier
 model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
+for i in tqdm(range(100), desc="Training Progress"):
+    time.sleep(0.1)  # Simulate a part of the training process
+    if i == 0:
+        model.fit(X_train, y_train)  # Fit the model only once
 
 # Evaluate the model
 predictions = model.predict(X_test)
 print(classification_report(y_test, predictions))
 
 # Save the model
-joblib.dump(model, 'random_forest_model.pkl')
+joblib.dump(model, 'random_forest_model2.pkl')
