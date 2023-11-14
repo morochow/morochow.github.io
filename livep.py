@@ -16,6 +16,7 @@ from bokeh.plotting import figure, show
 from bokeh.models import Range1d
 from bokeh.io import output_notebook
 import joblib
+from sklearn.ensemble import RandomForestRegressor
 
 class CustomLoggingHandler(logging.StreamHandler):
     def emit(self, record):
@@ -330,11 +331,33 @@ def get_last_5min_market_data(symbol):
         logger.error(f"Error fetching last 5-minute market data: {e}")
         return None, None
 
-
 def train_random_forest(X_train, y_train):
     model = RandomForestRegressor(n_estimators=100)
     model.fit(X_train, y_train)
     return model
+
+def add_technical_indicators(df):
+    # Simple Moving Average
+    df['SMA'] = talib.SMA(df['close'], timeperiod=20)
+    # Relative Strength Index
+    df['RSI'] = talib.RSI(df['close'])
+    # Moving Average Convergence Divergence
+    df['MACD'], df['MACD_signal'], _ = talib.MACD(df['close'])
+    # Bollinger Bands
+    df['upper_band'], df['middle_band'], df['lower_band'] = talib.BBANDS(df['close'], timeperiod=20)
+    # Exponential Moving Average
+    df['EMA'] = talib.EMA(df['close'], timeperiod=20)
+    # Average True Range
+    df['ATR'] = talib.ATR(df['high'], df['low'], df['close'], timeperiod=14)
+    # Stochastic Oscillator
+    df['slowk'], df['slowd'] = talib.STOCH(df['high'], df['low'], df['close'])
+    # Commodity Channel Index
+    df['CCI'] = talib.CCI(df['high'], df['low'], df['close'], timeperiod=20)
+    # Parabolic SAR
+    df['SAR'] = talib.SAR(df['high'], df['low'])
+    # On-Balance Volume
+    df['OBV'] = talib.OBV(df['close'], df['volume'])
+    return df
 
 def make_trading_decision(df, rf_model):
     current_data = df[-1:]  # Using the latest data point
@@ -365,7 +388,7 @@ def main():
         print(f"CoinMarketCap Data for {symbol_to_trade}: {market_data}")
 
     try:
-        rf_model = joblib.load('random_forest_model.pkl')
+        rf_model = joblib.load('random_forest_model2.pkl')
     except Exception as e:
         logger.error(f"Error loading Random Forest model: {e}")
         rf_model = None
@@ -376,10 +399,14 @@ def main():
             print("Progress: Fetching and analyzing data...")
             klines = get_symbol_klines(symbol_to_trade, interval, 100)
             features, labels, features_to_use = prepare_data(klines, window=window_size)
+            df = pd.DataFrame(klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
+            df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+            df.set_index('timestamp', inplace=True)
             scaler = StandardScaler().fit(features)
             scaled_features = scaler.transform(features)
             X_train, _, y_train, _ = train_test_split(scaled_features, labels, test_size=0.2, random_state=42)
-
+            df_with_indicators = add_technical_indicators(df)
+            
             if len(np.unique(y_train)) > 1:
                 logistic_regression_model = train_logistic_regression(X_train, y_train)
                 use_rf = True  # Set this based on user input or another condition
