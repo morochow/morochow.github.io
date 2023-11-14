@@ -161,13 +161,6 @@ def get_asset_balance(asset):
         logger.error(f"Error fetching balance for {asset}: {e}")
         return 0
 
-def get_user_input():
-    symbol_to_trade = input("Enter the trading pair (e.g., BTCUSDT): ").upper()
-    interval = input("Enter the time interval (e.g., 1m, 5m, 1h): ")
-    window_size = int(input("Enter the window size for feature calculation: "))
-    investment_amount = float(input("Enter the amount to invest in trading ($): "))
-    return symbol_to_trade, interval, window_size, investment_amount
-
 def format_quantity(quantity, symbol_info):
     # Adjust the quantity to match the asset's allowed precision
     step_size = float([f['stepSize'] for f in symbol_info['filters'] if f['filterType'] == 'LOT_SIZE'][0])
@@ -340,6 +333,7 @@ def default_strategy_decision(logistic_regression_signal, lorentzian_signal, mom
         action = "Buy"
     else:
         chosen_strategy = "No Clear Signal"
+        action = "No Action"
 
     return chosen_strategy, action
 
@@ -409,22 +403,19 @@ def evaluate_and_choose_strategy(df, logistic_regression_model, scaler, symbol_t
 
     return chosen_strategy, action
 
-def analyze_market_trend(df):
-    # Implement logic to analyze the market trend (e.g., using moving averages)
-    # Return 'upward', 'downward', or 'sideways'
-    pass
+def analyze_market_trend(df, short_window=12, long_window=26):
+    if df['short_ema'].iloc[-1] > df['long_ema'].iloc[-1] and df['close'].iloc[-1] > df['short_ema'].iloc[-1]:
+        return 'upward'
+    elif df['short_ema'].iloc[-1] < df['long_ema'].iloc[-1] and df['close'].iloc[-1] < df['short_ema'].iloc[-1]:
+        return 'downward'
+    else:
+        return 'sideways'
 
-def calculate_market_volatility(df):
-    # Implement logic to calculate market volatility (e.g., using standard deviation)
-    # Return a numerical value representing volatility
-    pass
-
-
-# Model Training and Prediction Functions
-def train_logistic_regression(X_train, y_train):
-    model = LogisticRegression(C=1.0, solver='lbfgs', max_iter=1000)
-    model.fit(X_train, y_train)
-    return model
+def calculate_market_volatility(df, window=14):
+    df['returns'] = df['close'].pct_change()
+    df['volatility'] = df['returns'].rolling(window=window).std()
+    current_volatility = df['volatility'].iloc[-1]
+    return current_volatility
 
 # Model Training and Prediction Functions
 def train_logistic_regression(X_train, y_train):
@@ -469,3 +460,146 @@ def predict_and_trade(model, X):
     prediction = model.predict(X)
     return prediction
 
+# Technical Indicators for Random Forest Regressor
+def add_technical_indicators(df):
+    # Simple Moving Average
+    df['SMA'] = talib.SMA(df['close'], timeperiod=20)
+    # Relative Strength Index
+    df['RSI'] = talib.RSI(df['close'])
+    # Moving Average Convergence Divergence
+    df['MACD'], df['MACD_signal'], _ = talib.MACD(df['close'])
+    # Bollinger Bands
+    df['upper_band'], df['middle_band'], df['lower_band'] = talib.BBANDS(df['close'], timeperiod=20)
+    # Exponential Moving Average
+    df['EMA'] = talib.EMA(df['close'], timeperiod=20)
+    # Average True Range
+    df['ATR'] = talib.ATR(df['high'], df['low'], df['close'], timeperiod=14)
+    # Stochastic Oscillator
+    df['slowk'], df['slowd'] = talib.STOCH(df['high'], df['low'], df['close'])
+    # Commodity Channel Index
+    df['CCI'] = talib.CCI(df['high'], df['low'], df['close'], timeperiod=20)
+    # Parabolic SAR
+    df['SAR'] = talib.SAR(df['high'], df['low'])
+    # On-Balance Volume
+    df['OBV'] = talib.OBV(df['close'], df['volume'])
+    return df
+
+# Define evaluation functions
+def is_lr_model_reliable(lr_signal):
+    # Implement your logic here
+    return True  # Placeholder
+
+def is_lorentzian_signal_strong(lorentzian_signal):
+    # Implement your logic here
+    return True  # Placeholder
+
+def is_squeezed_momentum_signal_strong(squeezed_momentum_signal):
+    # Implement your logic here
+    return True  # Placeholder
+
+def main():
+    print("Trading Bot v.1 TETRAHEDRON ALPHA")
+    symbol_to_trade, interval, window_size, investment_amount = get_user_input()
+    quote_asset = get_quote_asset(symbol_to_trade)
+
+    # Fetching and preparing initial data
+    klines = get_symbol_klines(symbol_to_trade, interval, 100)
+    df = pd.DataFrame(klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
+    df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+    df.set_index('timestamp', inplace=True)
+
+    # Adding technical indicators
+    df_with_indicators = add_technical_indicators(df)
+
+    executed_order = False  # Track whether a buy/sell order has been executed
+    chosen_strategy = "No Strategy Selected"  # Initialize chosen_strategy
+
+    try:
+        rf_model = joblib.load('random_forest_model.pkl')
+    except Exception as e:
+        logger.error(f"Error loading Random Forest model: {e}")
+        rf_model = None
+
+    try:
+        logistic_regression_model = joblib.load('logistic_regression_model.pkl')
+    except Exception as e:
+        logger.error(f"Error loading Logistic Regression model: {e}")
+        logistic_regression_model = None
+    
+    while not executed_order:
+        try:
+            # Fetch new market data and prepare features
+            klines = get_symbol_klines(symbol_to_trade, interval, 100)
+            df = pd.DataFrame(klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
+            df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+            df.set_index('timestamp', inplace=True)
+            df_with_indicators = add_technical_indicators(df)
+
+            # Prepare data for model
+            features, _ = prepare_data(df_with_indicators, window=window_size)
+
+            # Initialize and fit the scaler with the features
+            scaler = StandardScaler().fit(features)
+
+            if rf_model:
+                # Get the latest data for prediction
+                current_data = features.iloc[-1:]
+                current_data_scaled = scaler.transform(current_data)
+
+                # Make trading decision
+                action, chosen_strategy = make_trading_decision(df_with_indicators, rf_model, scaler, features.columns.tolist(), window_size)
+                print(f"Chosen Strategy: {chosen_strategy}, Action: {action}")
+
+                # Analysis Results
+                if logistic_regression_model:
+                    try:
+                        current_data_scaled = scaler.transform(features.iloc[-1:])
+                        lr_signal = logistic_regression_model.predict(current_data_scaled)[0]
+                        lorentzian_signal = lorentzian_classification(df_with_indicators)
+                        squeezed_momentum_signal = squeezed_momentum_indicator(df_with_indicators)
+
+                        # Evaluate and Choose Strategy
+                        if is_lr_model_reliable(lr_signal):
+                            chosen_strategy = "Logistic Regression"
+                        elif is_lorentzian_signal_strong(lorentzian_signal):
+                            chosen_strategy = "Lorentzian Classification"
+                        elif is_squeezed_momentum_signal_strong(squeezed_momentum_signal):
+                            chosen_strategy = "Squeezed Momentum Indicator"
+                        else:
+                            chosen_strategy = "Default Strategy"
+
+                        print("\nAnalysis Results:")
+                        print(f"Chosen Strategy: {chosen_strategy}")
+                        print(f"Logistic Regression Signal: {lr_signal}")
+                        print(f"Lorentzian Signal: {lorentzian_signal}")
+                        print(f"Squeezed Momentum Signal: {squeezed_momentum_signal}")
+                        logger.info(f"Chosen Strategy: {chosen_strategy}")
+                    except Exception as e:
+                        logger.error(f"Error in analysis results: {e}")
+                
+                # Execute order based on the decision
+                if action in ["Buy", "Sell"]:
+                    quantity = calculate_order_quantity(investment_amount, df_with_indicators['close'].iloc[-1], quote_asset)
+                    order = place_order(symbol_to_trade, Client.SIDE_BUY if action == "Buy" else Client.SIDE_SELL, quantity)
+                    if order:
+                        executed_order = True
+                        print(f"Order executed: {order}")
+                elif action == "No Action":
+                    print("No trading action taken. Holding and gathering data.")
+            else:
+                # Fallback strategy decision
+                chosen_strategy, action = default_strategy_decision()
+                print(f"Chosen Strategy: {chosen_strategy}, Action: {action}")
+
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+            time.sleep(60)  # Sleep before retrying
+
+        # Additional analysis and logging
+        # ...
+
+    # Additional code for the main function
+    # ...
+
+if __name__ == "__main__":
+    main()
