@@ -160,3 +160,10 @@ containers.forEach((container) => {
     container.style.filter = "blur(5px)";
   });
 });
+
+$('div.ct, a').click(function(event) {
+    var href = $(this).attr('href');
+    if (href && href.startsWith('#')) {
+        history.pushState({}, '', ' '); // This line prevents the URL from being updated
+    }
+});
