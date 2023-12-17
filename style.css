@@ -58,7 +58,7 @@ body {
 	font-family: 'Nonchalance Regular';
     font-style: normal;
     font-weight: normal;
-    src: local('Nonchalance Regular'), url('Nonchalance Regular.woff') format('woff');
+    src: local('Nonchalance Regular'), url('fonts/nonchalance/Nonchalance Regular.woff') format('woff');
 }
     
 
@@ -66,7 +66,7 @@ body {
     font-family: 'Nonchalance Medium';
     font-style: normal;
     font-weight: normal;
-    src: local('Nonchalance Medium'), url('Nonchalance Medium.woff') format('woff');
+    src: local('Nonchalance Medium'), url('fonts/nonchalance/Nonchalance Medium.woff') format('woff');
 }
     
 
@@ -74,7 +74,7 @@ body {
     font-family: 'Nonchalance Bold';
     font-style: normal;
     font-weight: normal;
-    src: local('Nonchalance Bold'), url('Nonchalance Bold.woff') format('woff');
+    src: local('Nonchalance Bold'), url('fonts/nonchalance/Nonchalance Bold.woff') format('woff');
 }
 
 .container container-ph {

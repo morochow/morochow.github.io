@@ -163,4 +163,6 @@ containers.forEach((container) => {
 
 $('a').click(function(event) {
     event.preventDefault();
+    var target = $(this).attr('href');
+    $(target).hide().fadeIn(1000);
 });

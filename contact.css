@@ -1,8 +1,8 @@
 .containers {
     position: absolute;
     display: flex;
-    width: 100vh;
-    height: 100vw;
+    width: 100dvh;
+    height: 100dvw;
     overflow: hidden;
     overflow-x: hidden;
     z-index: 1;
@@ -15,8 +15,8 @@
     z-index: 1;
     align-items: center;
     align-self: center;
-    width: 100vw;
-    height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
     z-index: 1;
 }
   
