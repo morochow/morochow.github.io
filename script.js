@@ -167,3 +167,24 @@ $('div.ct, a').click(function(event) {
         history.pushState({}, '', ' '); // This line prevents the URL from being updated
     }
 });
+
+
+$('div.ct, a[href^="#"]').click(function() {
+    // Store the original hash
+    var originalHash = window.location.hash;
+
+    // Wait for the browser to update the hash and then replace it with the original hash
+    setTimeout(function() {
+        history.replaceState(null, null, originalHash);
+    }, 0);
+});
+
+$('div.ct, a[href^="#"]').click(function() {
+    // Store the original URL
+    var originalURL = window.location.href;
+
+    // Wait for the browser to update the URL and then replace it with the original URL
+    setTimeout(function() {
+        history.replaceState(null, null, originalURL);
+    }, 0);
+});
