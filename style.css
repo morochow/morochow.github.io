@@ -6,6 +6,7 @@ body {
   letter-spacing: 0.2rem;
   margin: 0;
   overflow: hidden;
+  perspective: 1000px;
   text-transform: uppercase;
   cursor: url("data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 25.1.0, SVG Export Plug-In --%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='16.1px' height='14px' viewBox='0 0 16.1 14' style='overflow:visible;enable-background:new 0 0 16.1 14;' xml:space='preserve'%3E%3Cstyle type='text/css'%3E .st0%7Bfill:%23838A97;%7D%0A%3C/style%3E%3Cdefs%3E%3C/defs%3E%3Cpath class='st0' d='M7.1,1.5l8.8,11.1c0.5,0.7-0.2,1.6-1,1.2L2.2,7.5C-3.3,4.3,2.7-3.2,7.1,1.5z'/%3E%3C/svg%3E%0A") 7 11,
     pointer;
@@ -16,20 +17,6 @@ body {
   -ms-user-select: none;
   user-select: none;
   scroll-behavior: smooth;
-  touch-action: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  -moz-tap-highlight-color: transparent;
-  -ms-tap-highlight-color: transparent;
-  tap-highlight-color: transparent;
-}
-
-*:focus {
-  outline: transparent;
-}
-
-*::-moz-focus-inner {
-  border: transparent;
 }
 
 @font-face {
@@ -54,22 +41,14 @@ body {
   font-style: normal;
 }
 
-.container container-ph {
+.container container--ph {
   height: 0;
+
   position: absolute;
   z-index: 1 !important;
-}
-
-.containerblur {
-  filter: blur(1.618px);
-  transition: filter 1.618s ease;
-  z-index: 99999;
 
 }
 
-.containerblur:focus {
-  filter: none;
-}
 
 .iframe--responsive {
   position: absolute;
@@ -119,19 +98,20 @@ body {
 }
 
 .panel-wrap {
-  height: 90vh;
-  width: 90vw;
+  height:  100dvh;
+  width:  100dvw;
 
 }
 
 h1 {
+  
   font-weight: 100;
   margin: 0;
 }
 
 .panel-wrap {
-  height: 100vh;
-  width: 100vw;
+  height:  100dvh;
+  width:  100dvw;
   perspective: 2000px;
   transition: transform 0.3s cubic-bezier(0.55, 0, 0.1, 1);
 }
@@ -141,10 +121,10 @@ h1 {
 }
 
 .panel {
-  height: 100vh;
+  height:  100dvh;
   position: absolute;
   transition: transform 0.5s cubic-bezier(0.55, 0, 0.1, 1);
-  width: 100vw;
+  width:  100dvw;
   will-change: transform;
 }
 
@@ -179,7 +159,7 @@ h1 {
   position: absolute;
   text-align: center;
   padding-left: 0.5rem;
-  top: 53vh;
+  top: 52%;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
@@ -190,7 +170,7 @@ h2 {
   position: absolute;
   text-align: center;
   padding-left: 0.5rem;
-  top: 11vh;
+  top: 5.5%;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
@@ -227,20 +207,20 @@ h6 {
   font-size: 0.5rem;
   font-family: "Nordstern";
   opacity: 0.4;
-  top: calc(100vh - 20em);
+  top: calc( 100dvh - 11em);
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
 
 .h7 {
-  left: 50vw;
+  left: 50%;
   line-height: 1;
-  position: fixed;
+  position: absolute;
   text-align: center;
   font-size: 0.618rem;
   font-family: "Nordstern";
   opacity: 0.8;
-
+  top: calc( 100dvh - 10em);
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
@@ -315,7 +295,7 @@ br .concept {
 
 .panel__nav {
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 0.2;
   position: absolute;
   transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
   user-select: none;
@@ -524,26 +504,4 @@ html * {
   float: left;
   width: 2rem;
   height: 2rem;
-}
-
-.imgp {
-  display: block;
-  justify-content: center;
-  align-items: center;
-  z-index: 99999;
-}
-
-@media (max-width: 768px) {
-  .flex-container {
-    height: 90%;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 768px) {
-  .site-wrap {
-    height: 90%;
-    /* Change height for smaller screens */
-  }
 }

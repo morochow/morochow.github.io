@@ -36,7 +36,7 @@
   body:before,
   body:after {
     content: "";
-    height: 50vh;
+    height: 50dvh;
     width: 100%;
     position: fixed;
     left: 0;
@@ -131,7 +131,7 @@
   }
   main .-content {
     position: relative;
-    height: 100vh;
+    height: 100dvh;
   }
   main .-content > div {
     height: 100%;

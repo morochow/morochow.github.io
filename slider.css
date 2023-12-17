@@ -1,5 +1,5 @@
 .slider {
-  height: 100vh;
+  height: 100dvh;
   position: relative;
   overflow: hidden;
   display: -webkit-box;
@@ -174,7 +174,7 @@ embed {
   font-family: "Nordstern";
   font-size: 0.9rem;
   margin-bottom: 0.1rem;
-  max-width: 80vw;
+  max-width: 80dvw;
 }
 
 @-webkit-keyframes check {
@@ -203,7 +203,7 @@ embed {
 
 
 .slider2 {
-  height: 90vh;
+  height: 100dvh;
   position: relative;
   overflow: hidden;
   display: -webkit-box;
