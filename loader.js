@@ -52,7 +52,7 @@ $("#button").click(() => {
 });
 
 $("#button").on("click", function () {
-  window.location.href = "../dist/index.html";
+  window.location.href = "https://morochow.github.io/index.html";
 });
 
 $(".js-trigger-transition").on("click", function (e) {
@@ -103,9 +103,6 @@ function showPage() {
 $("#button").on("click", function () {
   showPage();
   // You may want to add more logic here if needed
-  window.location.href = "../index.html";
+  window.location.href = "https://morochow.github.io/index.html";
 });
 
-$('a').click(function(event) {
-    event.preventDefault();
-});

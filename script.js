@@ -160,3 +160,7 @@ containers.forEach((container) => {
     container.style.filter = "blur(5px)";
   });
 });
+
+$('a').click(function(event) {
+    event.preventDefault();
+});
