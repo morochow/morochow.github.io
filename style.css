@@ -55,26 +55,26 @@ body {
 }
 
 @font-face {
-	font-family: 'Nonchalance Regular';
+	font-family: 'Nonchalance';
     font-style: normal;
     font-weight: normal;
-    src: local('Nonchalance Regular'), url('fonts/nonchalance/Nonchalance Regular.woff') format('woff');
+    src: url('fonts/nonchalance/Nonchalance-Regular.woff') format('woff');
 }
     
 
 @font-face {
-    font-family: 'Nonchalance Medium';
+    font-family: 'Nonchalance';
     font-style: normal;
     font-weight: normal;
-    src: local('Nonchalance Medium'), url('fonts/nonchalance/Nonchalance Medium.woff') format('woff');
+    src: url('fonts/nonchalance/Nonchalance-Medium.woff') format('woff');
 }
     
 
     @font-face {
-    font-family: 'Nonchalance Bold';
+    font-family: 'Nonchalance';
     font-style: normal;
-    font-weight: normal;
-    src: local('Nonchalance Bold'), url('fonts/nonchalance/Nonchalance Bold.woff') format('woff');
+    font-weight: bold;
+    src: url('fonts/nonchalance/Nonchalance-Bold.woff') format('woff');
 }
 
 .container container-ph {
@@ -545,7 +545,6 @@ html * {
 
 }
 
-
 .imgp {
   display: block;
   justify-content: center;
@@ -561,7 +560,8 @@ html * {
 
 @media (max-width: 768px) {
   .flex-container {
-    height: 90%;
+    height: 90dvh;
+    width: 90dvw;
     align-items: center;
     justify-content: center;
   }
@@ -569,7 +569,26 @@ html * {
 
 @media (max-width: 768px) {
   .site-wrap {
-    height: 90%;
-    /* Change height for smaller screens */
+    height: 100dvh;
+    width: 100vw;
+  }
+}
+
+@media screen and (orientation: landscape) {
+    body {
+     height: 100dvh;
+     width: 100vw;
+    }
+
+  .site-wrap {
+    height: 100dvh;
+    width: 100vw;
+  }
+
+  .flex-container {
+    height: 90dvh;
+    width: 90dvw;
+    align-items: center;
+    justify-content: center;
   }
 }
