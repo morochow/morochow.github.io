@@ -54,6 +54,29 @@ body {
   font-style: normal;
 }
 
+@font-face {
+	font-family: 'Nonchalance Regular';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Nonchalance Regular'), url('Nonchalance Regular.woff') format('woff');
+}
+    
+
+@font-face {
+    font-family: 'Nonchalance Medium';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Nonchalance Medium'), url('Nonchalance Medium.woff') format('woff');
+}
+    
+
+    @font-face {
+    font-family: 'Nonchalance Bold';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Nonchalance Bold'), url('Nonchalance Bold.woff') format('woff');
+}
+
 .container container-ph {
   height: 0;
 
