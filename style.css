@@ -530,6 +530,12 @@ html * {
   z-index: 99999;
 }
 
+.imgb {
+  float: left;
+  width: 2rem;
+  height: 2rem;
+}
+
 @media (max-width: 768px) {
   .flex-container {
     height: 90%;
