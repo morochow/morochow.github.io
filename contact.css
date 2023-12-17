@@ -296,13 +296,13 @@ a {
 }
 
 .right ul .css {
-    width: 80%;
+    width: 90%;
     background-color:#55C2BA ;
 }
 
 
 .right ul .js {
-    width: 70%;
+    width: 20%;
     background-color: #54B849;
 }
 
@@ -313,7 +313,7 @@ a {
 
 
 .right ul .reactjs {
-    width: 30%;
+    width: 10%;
     background-color: #D71821;
 }
 

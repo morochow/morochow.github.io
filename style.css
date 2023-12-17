@@ -216,7 +216,7 @@ h2 {
   position: absolute;
   text-align: center;
   padding-left: 0.5rem;
-  top: 5.5%;
+  top: 7vh;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
@@ -591,4 +591,9 @@ html * {
     align-items: center;
     justify-content: center;
   }
+}
+
+:root {
+  --animate-duration: 1800ms;
+  --animate-delay: 2s;
 }
