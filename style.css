@@ -570,19 +570,19 @@ html * {
 @media (max-width: 768px) {
   .site-wrap {
     height: 100dvh;
-    width: 100vw;
+    width: 100dvw;
   }
 }
 
 @media screen and (orientation: landscape) {
     body {
      height: 100dvh;
-     width: 100vw;
+     width: 100dvw;
     }
 
   .site-wrap {
     height: 100dvh;
-    width: 100vw;
+    width: 100dvw;
   }
 
   .flex-container {

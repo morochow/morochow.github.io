@@ -160,9 +160,3 @@ containers.forEach((container) => {
     container.style.filter = "blur(5px)";
   });
 });
-
-$('a').load(function(event) {
-    event.preventDefault();
-    var target = $(this).attr('href');
-    $(target).hide().fadeIn(1000);
-});
