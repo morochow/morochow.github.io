@@ -1,16 +1,16 @@
     @font-face {
-    font-family: 'Nonchalance Regular';
+    font-family: 'Nonchalance';
     font-style: normal;
     font-weight: normal;
-    src: local('Nonchalance Regular'), url('Nonchalance Regular.woff') format('woff');
+    src: local('./fonts/Nonchalance-Regular'), url('./fonts/Nonchalance-Regular.woff') format('woff');
     }
     
 
     @font-face {
-    font-family: 'Nonchalance Medium';
+    font-family: 'Nonchalance';
     font-style: normal;
     font-weight: normal;
-    src: local('Nonchalance Medium'), url('Nonchalance Medium.woff') format('woff');
+    src: local('./fonts/Nonchalance-Medium'), url('./fonts/Nonchalance-Medium.woff') format('woff');
     }
     
 
