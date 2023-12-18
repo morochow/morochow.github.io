@@ -560,8 +560,8 @@ html * {
 
 @media (max-width: 768px) {
   .flex-container {
-    height: 100dvh;
-    width: 100dvw;
+    height: 100vh;
+    width: 100vw;
     align-items: center;
     justify-content: center;
   }
@@ -576,8 +576,8 @@ html * {
 
 @media screen and (orientation: landscape) {
     body {
-     height: 100dvh;
-     width: 100dvw;
+     height: 100vh;
+     width: 100vw;
     }
 
   .site-wrap {
@@ -586,8 +586,8 @@ html * {
   }
 
   .flex-container {
-    height: 100dvh;
-    width: 100dvw;
+    height: 100vh;
+    width: 100vw;
     align-items: center;
     justify-content: center;
   }
