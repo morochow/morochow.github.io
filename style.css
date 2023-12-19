@@ -247,7 +247,7 @@ h6 {
   font-size: 0.5rem;
   font-family: "Nordstern";
   opacity: 0.4;
-  top: calc( 100vvh - 11em);
+  top: calc( 100vh - 11em);
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
@@ -260,7 +260,7 @@ h6 {
   font-size: 0.618rem;
   font-family: "Nordstern";
   opacity: 0.8;
-  top: calc( 100vvh - 10em);
+  top: calc( 100vh - 10em);
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
