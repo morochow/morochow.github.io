@@ -144,8 +144,8 @@ body {
 }
 
 .panel-wrap {
-  height:  100dvh;
-  width:  100dvw;
+  height:  100vh;
+  width:  100vw;
 
 }
 
@@ -156,8 +156,8 @@ h1 {
 }
 
 .panel-wrap {
-  height:  100dvh;
-  width:  100dvw;
+  height:  100vh;
+  width:  100vw;
   perspective: 2000px;
   transition: transform 0.3s cubic-bezier(0.55, 0, 0.1, 1);
 }
@@ -167,10 +167,10 @@ h1 {
 }
 
 .panel {
-  height:  100dvh;
+  height:  100vh;
   position: absolute;
   transition: transform 0.5s cubic-bezier(0.55, 0, 0.1, 1);
-  width:  100dvw;
+  width:  100vw;
   will-change: transform;
 }
 
@@ -253,7 +253,7 @@ h6 {
   font-size: 0.5rem;
   font-family: "Nordstern";
   opacity: 0.4;
-  top: calc( 100dvh - 11em);
+  top: calc( 100vvh - 11em);
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
@@ -266,7 +266,7 @@ h6 {
   font-size: 0.618rem;
   font-family: "Nordstern";
   opacity: 0.8;
-  top: calc( 100dvh - 10em);
+  top: calc( 100vvh - 10em);
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
