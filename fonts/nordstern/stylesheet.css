@@ -1,22 +1,23 @@
 @font-face {
-    font-family: 'Nordstern Demo';
-    src: url('hinted-NordsternDemo-Bold.eot');
-    src: url('hinted-NordsternDemo-Bold.eot?#iefix') format('embedded-opentype'),
-        url('hinted-NordsternDemo-Bold.woff2') format('woff2'),
-        url('hinted-NordsternDemo-Bold.woff') format('woff'),
-        url('hinted-NordsternDemo-Bold.ttf') format('truetype');
+    font-family: 'Nordstern';
     font-weight: bold;
     font-style: normal;
+    src: url('./fonts/nordstern/hinted-NordsternDemo-Bold.eot');
+    src: url('./fonts/nordstern/hinted-NordsternDemo-Bold.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/nordstern/hinted-NordsternDemo-Bold.woff2') format('woff2'),
+        url('./fonts/nordstern/hinted-NordsternDemo-Bold.woff') format('woff'),
+        url('./fonts/nordstern/hinted-NordsternDemo-Bold.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'Nordstern Demo';
-    src: url('hinted-NordsternDemo-Regular.eot');
-    src: url('hinted-NordsternDemo-Regular.eot?#iefix') format('embedded-opentype'),
-        url('hinted-NordsternDemo-Regular.woff2') format('woff2'),
-        url('hinted-NordsternDemo-Regular.woff') format('woff'),
-        url('hinted-NordsternDemo-Regular.ttf') format('truetype');
+    font-family: 'Nordstern';
     font-weight: normal;
     font-style: normal;
+    src: url('./fonts/nordstern/hinted-NordsternDemo-Regular.eot');
+    src: url('./fonts/nordstern/hinted-NordsternDemo-Regular.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/nordstern/hinted-NordsternDemo-Regular.woff2') format('woff2'),
+        url('./fonts/nordstern/hinted-NordsternDemo-Regular.woff') format('woff'),
+        url('./fonts/nordstern/hinted-NordsternDemo-Regular.ttf') format('truetype');
+
 }
 

@@ -1,30 +1,30 @@
 @font-face {
-  font-family: "Nordstern";
-  src: url("fonts/nordstern/hinted-NordsternDemo-Bold.eot");
-  src: url("fonts/nordstern/hinted-NordsternDemo-Bold.eot?#iefix") format("embedded-opentype"),
-    url("fonts/nordstern/hinted-NordsternDemo-Bold.woff2") format("woff2"),
-    url("fonts/nordstern/hinted-NordsternDemo-Bold.woff") format("woff"),
-    url("fonts/nordstern/hinted-NordsternDemo-Bold.ttf") format("truetype");
+  font-family: 'Nordstern';
   font-weight: bold;
   font-style: normal;
+  src: url("./fonts/nordstern/hinted-NordsternDemo-Bold.eot");
+  src: url("./fonts/nordstern/hinted-NordsternDemo-Bold.eot?#iefix") format("embedded-opentype"),
+    url("./fonts/nordstern/hinted-NordsternDemo-Bold.woff2") format("woff2"),
+    url("./fonts/nordstern/hinted-NordsternDemo-Bold.woff") format("woff"),
+    url("./fonts/nordstern/hinted-NordsternDemo-Bold.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "Nordstern";
-  src: url("fonts/nordstern/hinted-NordsternDemo-Regular.eot");
-  src: url("fonts/nordstern/hinted-NordsternDemo-Regular.eot?#iefix") format("embedded-opentype"),
-    url("fonts/nordstern/hinted-NordsternDemo-Regular.woff2") format("woff2"),
-    url("fonts/nordstern/hinted-NordsternDemo-Regular.woff") format("woff"),
-    url("fonts/nordstern/hinted-NordsternDemo-Regular.ttf") format("truetype");
-  font-weight: normal;
+  font-family: 'Nordstern';
+  font-weight: 100;
   font-style: normal;
+  src: url("./fonts/nordstern/hinted-NordsternDemo-Regular.eot");
+  src: url("./fonts/nordstern/hinted-NordsternDemo-Regular.eot?#iefix") format("embedded-opentype"),
+    url("./fonts/nordstern/hinted-NordsternDemo-Regular.woff2") format("woff2"),
+    url("./fonts/nordstern/hinted-NordsternDemo-Regular.woff") format("woff"),
+    url("./fonts/nordstern/hinted-NordsternDemo-Regular.ttf") format("truetype");
 }
 
 @font-face {
-	font-family: 'Nonchalance';
+	font-family: 'Nordstern';
     font-style: normal;
-    font-weight: normal;
-    src: url('fonts/nonchalance/Nonchalance-Regular.woff') format('woff');
+    font-weight: 100;
+    src: url('./fonts/nonchalance/Nonchalance-Regular.woff') format('woff');
 }
     
 
@@ -32,7 +32,7 @@
     font-family: 'Nonchalance';
     font-style: normal;
     font-weight: normal;
-    src: url('fonts/nonchalance/Nonchalance-Medium.woff') format('woff');
+    src: url('./fonts/nonchalance/Nonchalance-Medium.woff') format('woff');
 }
     
 
@@ -40,7 +40,7 @@
     font-family: 'Nonchalance';
     font-style: normal;
     font-weight: bold;
-    src: url('fonts/nonchalance/Nonchalance-Bold.woff') format('woff');
+    src: url('./fonts/nonchalance/Nonchalance-Bold.woff') format('woff');
 }
 
 body {
@@ -198,7 +198,7 @@ h1 {
   line-height: 0.8;
   position: absolute;
   text-align: center;
-  padding-left: 0.5rem;
+  padding-left: 0.5em;
   top: 52%;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
@@ -209,7 +209,7 @@ h2 {
   line-height: 0.8;
   position: absolute;
   text-align: center;
-  padding-left: 0.5rem;
+  padding-left: 0.5em;
   top: 7vh;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
@@ -221,7 +221,7 @@ h3 {
   position: absolute;
   text-align: center;
   font-size: small;
-  font-family: "Nordstern";
+  font-family: 'Nordstern';
   top: 80%;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
@@ -232,8 +232,8 @@ h4 {
   line-height: 1;
   position: absolute;
   text-align: center;
-  font-size: 0.8rem;
-  font-family: "Nordstern";
+  font-size: 0.8em;
+  font-family: 'Nordstern';
   top: 60%;
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
@@ -244,10 +244,10 @@ h6 {
   line-height: 1;
   position: absolute;
   text-align: center;
-  font-size: 0.5rem;
-  font-family: "Nordstern";
+  font-size: 0.5em;
+  font-family: 'Nordstern';
   opacity: 0.4;
-  top: calc( 100vh - 11em);
+  top: calc( 100vh - 11rem);
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
@@ -257,16 +257,17 @@ h6 {
   line-height: 1;
   position: absolute;
   text-align: center;
-  font-size: 0.618rem;
-  font-family: "Nordstern";
+  font-size: 0.618em;
+  font-family: C;
   opacity: 0.8;
-  top: calc( 100vh - 10em);
+  top: calc( 100vh - 10rem);
   transform: translateX(-50%) translateY(-50%);
   user-select: none;
 }
 
 br {
   content: "";
+  font-family: 'Nordstern';
   margin: 0.3em;
   display: flex;
   font-size: 30%;
@@ -274,7 +275,7 @@ br {
 
 br .concept {
   content: "";
-  font-family: "Nordstern";
+  font-family: 'Nordstern';
   margin: 0.1em;
   display: flex;
   font-size: 50%;
@@ -320,7 +321,7 @@ br .concept {
   transform: translateX(-50%) translateY(-50%) translateY(12vmin);
   transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
   user-select: none;
-  font-family: "Nordstern";
+  font-family: 'Nordstern';
   font-weight: bold;
   z-index: 10;
 }
@@ -340,14 +341,14 @@ br .concept {
   transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
   user-select: none;
   will-change: opacity;
-  font-family: "Nordstern";
+  font-family: 'Nordstern';
 }
 
 .panel__nav--up {
   left: 50%;
   top: 1rem;
   transform: translateX(-50%);
-  font-size: 0.7em;
+  font-size: 0.7rem;
 }
 
 .panel__nav--left {

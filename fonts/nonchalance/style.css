@@ -15,8 +15,8 @@
     
 
     @font-face {
-    font-family: 'Nonchalance Bold';
+    font-family: 'Nonchalance';
     font-style: normal;
-    font-weight: normal;
-    src: local('Nonchalance Bold'), url('Nonchalance Bold.woff') format('woff');
+    font-weight: bold;
+    src: local('./fonts/Nonchalance-Bold'), url('./fonts/Nonchalance-Bold.woff') format('woff');
     }

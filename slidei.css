@@ -9,7 +9,7 @@
 .containeri {
   position: relative;
   overflow: hidden;
-  border-radius: 5em;
+  border-radius: 5rem;
 }
 
 @media only screen and (max-width: 1000px) {
@@ -20,7 +20,7 @@
 .slideri {
   display: flex;
   width: 700%;
-  height: 55em;
+  height: 55rem;
   transition: all 0.25s ease-in;
   transform: translateX(0);
 }
@@ -47,14 +47,14 @@
   }
 }
 .slideri .box .bg {
-  padding: 2em;
+  padding: 2rem;
   background-color: rgba(0, 0, 0, 0.2);
   width: 60%;
   transform: skewX(7deg);
   position: absolute;
   height: 100%;
   left: -10%;
-  padding-left: 20em;
+  padding-left: 20rem;
   transform-origin: 0 100%;
 }
 
@@ -92,8 +92,8 @@
   }
 }
 .slideri .box .details {
-  padding: 5em;
-  padding-left: 10em;
+  padding: 5rem;
+  padding-left: 10rem;
   z-index: 100;
   grid-column: 1/span 1;
   grid-row: 1/-1;
@@ -104,22 +104,22 @@
     grid-row: 2/span 1;
     grid-column: 1/-1;
     text-align: center;
-    padding: 2em;
+    padding: 2rem;
     transform: translateY(-9em);
   }
 }
 .slideri .box .details h1 {
-  font-size: 3.5em;
+  font-size: 3.5rem;
   font-weight: 500;
   margin-bottom: 0.5em;
 }
 
 .slideri .box .details p {
   display: inline-block;
-  font-size: 1.3em;
+  font-size: 1.3rem;
   color: #B5B4B4;
-  margin-bottom: 2em;
-  margin-right: 5em;
+  margin-bottom: 2rem;
+  margin-right: 5rem;
 }
 
 @media only screen and (max-width: 800px) {
@@ -128,9 +128,9 @@
   }
 }
 .slideri .box .details button {
-  padding: 1em 3em;
+  padding: 1rem 3rem;
   color: #fff;
-  border-radius: 2em;
+  border-radius: 2rem;
   outline: none;
   border: none;
   cursor: pointer;
@@ -274,8 +274,8 @@
   }
 }
 .slideri .illustration div {
-  height: 25em;
-  width: 18em;
+  height: 25rem;
+  width: 18rem;
   border-radius: 3em;
   background-color: #FF0077;
   position: relative;
@@ -284,8 +284,8 @@
 
 @media only screen and (max-width: 800px) {
   .slideri .illustration div {
-    height: 20em;
-    width: 15em;
+    height: 20rem;
+    width: 15rem;
   }
 }
 .slideri .illustration div::after, .slider .illustration div::before {
@@ -293,17 +293,17 @@
   position: absolute;
   height: 100%;
   width: 100%;
-  border-radius: 3em;
+  border-radius: 3rem;
   top: 0;
   left: 0;
 }
 
 .slideri .illustration div::after {
-  transform: translate(4em, -1em);
+  transform: translate(4rem, -1rem);
 }
 
 .slideri .illustration div::before {
-  transform: translate(2em, -2em);
+  transform: translate(2rem, -2rem);
 }
 
 .prev,
@@ -315,7 +315,7 @@
 
 .prev,
 .next {
-  width: 4em;
+  width: 4rem;
   cursor: pointer;
   opacity: 0.2;
   transition: all 0.3s ease;
@@ -353,7 +353,7 @@
   grid-template-columns: repeat(7, 1fr);
   gap: 1em;
   text-align: center;
-  font-size: 1em;
+  font-size: 1rem;
 }
 
 @media only screen and (max-width: 650px) {
@@ -363,7 +363,7 @@
   }
 }
 .trail div {
-  padding: 2em;
+  padding: 2rem;
   border-top: 3px solid #fff;
   cursor: pointer;
   opacity: 0.3;
@@ -376,7 +376,7 @@
 
 @media only screen and (max-width: 650px) {
   .trail div {
-    padding: 1em;
+    padding: 1rem;
   }
 }
 .active {
