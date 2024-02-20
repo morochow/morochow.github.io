@@ -174,7 +174,7 @@ nav {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   width: 100%;
-  padding: 14px 0;
+  padding: 15% 0;
   opacity: 0;
   text-align: center;
   transform: translateY(-100%);
@@ -219,7 +219,7 @@ nav {
 
 .overlay-menu ul {
   list-style: none;
-  margin-top: 10vh;
+  margin-top: 12vh;
   padding: 0px;
 }
 .overlay-menu ul li {
@@ -305,13 +305,13 @@ nav {
 }
 
 #video-container .video-content .inner h1 {
-  font-family: 'Codystar', sans-serif;
-  font-size: 49px;
+  /* font-family: 'Codystar', sans-serif; */
+  font-size: 6em;
   text-transform: uppercase;
   color: #fff;
   letter-spacing: 1.5px;
   line-height: 10px;
-  font-weight: 600;
+  font-weight: 500;
   text-align: center;
   margin-bottom: 1px;
   gap: 1px;

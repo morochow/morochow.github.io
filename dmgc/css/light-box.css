@@ -27,6 +27,7 @@ body.lb-disable-scrolling {
   margin-top: 0%;
   left: 0;
   width: 100%;
+  max-height: 100%;
   z-index: 100000;
   text-align: center;
   line-height: 0;
@@ -42,7 +43,7 @@ body.lb-disable-scrolling {
   border-radius: 5px;
 
   /* Image border */
-  border: 2px solid white;
+  /* border: 2px solid white; */
 }
 
 .lightbox a img {
@@ -52,10 +53,10 @@ body.lb-disable-scrolling {
 .lb-outerContainer {
   position: relative;
   *zoom: 1;
-  width: 250px;
-  height: 250px;
+  width: 100vw;
+  height: 100vh;
   margin: 0 auto;
-  border-radius: 4px;
+  border-radius: 5px;
 
   /* Background color behind image.
      This is visible during transitions. */
@@ -64,7 +65,7 @@ body.lb-disable-scrolling {
 
 .lb-outerContainer:after {
   content: "";
-  display: table;
+  display: block;
   clear: both;
 }
 
@@ -111,7 +112,7 @@ body.lb-disable-scrolling {
 }
 
 .lb-nav a.lb-prev {
-  width: 25%;
+  width: 10%;
   left: 0;
   float: left;
   background: url(../img/prev.png) left 51% no-repeat;
@@ -131,7 +132,7 @@ body.lb-disable-scrolling {
 }
 
 .lb-nav a.lb-next {
-  width: 25%;
+  width: 10%;
   right: 0;
   float: right;
   background: url(../img/next.png) right 51% no-repeat;
@@ -155,6 +156,7 @@ body.lb-disable-scrolling {
   padding-top: 5px;
   *zoom: 1;
   width: 100%;
+  height: 100%!important;
   -moz-border-radius-bottomleft: 2px;
   -webkit-border-bottom-left-radius: 2px;
   border-bottom-left-radius: 2px;
@@ -165,17 +167,17 @@ body.lb-disable-scrolling {
 
 .lb-dataContainer:after {
   content: "";
-  display: table;
+  display: flex;
   clear: both;
 }
 
 .lb-data {
-  padding: 0 4px;
+  padding: 0 5px;
   color: #ccc;
 }
 
 .lb-data .lb-details {
-  width: 85%;
+  width: 100%;
   float: left;
   text-align: left;
   line-height: 1.1em;
@@ -202,11 +204,11 @@ body.lb-disable-scrolling {
 
 .lb-data .lb-close {
   display: block;
-  clear: right;
+  clear: both;
   float: right;
-  padding-top: 1.7em;
-  width: 21px;
-  height: 21px;
+  padding-top: none;
+  width: 16px;
+  height: 16px;
   background: url(../img/close.svg) right no-repeat;
   text-align: right;
   outline: none;
