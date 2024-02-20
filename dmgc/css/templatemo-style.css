@@ -174,7 +174,7 @@ nav {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   width: 100%;
-  padding: 15% 0;
+  padding: 3% 0;
   opacity: 0;
   text-align: center;
   transform: translateY(-100%);
@@ -490,7 +490,7 @@ nav {
   margin: 0 auto;
   background-color: transparent;
   cursor: none;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 .modal-animated-in {
   animation: totop-in .6s ease;
@@ -532,7 +532,7 @@ nav {
   margin: 0 auto;
   cursor: none;
   top: 3vh;
-  margin-bottom: 14px!important;
+  margin-bottom: 10px!important;
 }
 
 .modal-body input {
@@ -710,6 +710,7 @@ footer a:hover {
   background-color: transparent;
   position: relative;
   cursor: none;
+  scroll-behavior: smooth;
 }
 
 .masonry .item {
